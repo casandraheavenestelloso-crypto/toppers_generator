@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greeting Card Creator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Gistesy';
+            src: url('https://fonts.cdnfonts.com/s/15595/Gistesy.woff') format('woff');
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 50px;
+            padding: 5px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .background-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .bg-option {
+            position: relative;
+            width: 100%;
+            padding-top: 36.22%; /* 263/726 ratio */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+        }
+
+        .bg-option img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .bg-option:hover {
+            transform: scale(1.05);
+        }
+
+        .bg-option.selected {
+            box-shadow: 0 0 0 4px #667eea;
+            transform: scale(1.05);
+        }
+
+        .preview-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-section h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        #canvas {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Greeting Card Creator</h1>
+        
+        <div class="form-section">
+            <div class="form-group">
+                <label for="greeting">Greeting Text:</label>
+                <input type="text" id="greeting" placeholder="e.g., Happy Birthday!" maxlength="50">
+            </div>
+
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" placeholder="e.g., John" maxlength="30">
+            </div>
+
+            <div class="form-group">
+                <label for="additional">Additional Text (Optional):</label>
+                <input type="text" id="additional" placeholder="e.g., Have a wonderful day!" maxlength="100">
+            </div>
+
+            <div class="form-group">
+                <label for="fontColor">Font Color:</label>
+                <input type="color" id="fontColor" value="#ffffff">
+            </div>
+
+            <div class="form-group">
+                <label for="bgUpload">Upload Background Images:</label>
+                <input type="file" id="bgUpload" accept="image/*" multiple>
+            </div>
+
+            <div class="form-group">
+                <label>Choose Background:</label>
+                <div class="background-selector" id="bgSelector"></div>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <h2>Preview</h2>
+            <canvas id="canvas" width="726" height="263"></canvas>
+        </div>
+
+        <button class="download-btn" onclick="downloadImage()">📥 Download Image</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const greetingInput = document.getElementById('greeting');
+        const nameInput = document.getElementById('name');
+        const additionalInput = document.getElementById('additional');
+        const fontColorInput = document.getElementById('fontColor');
+        const bgSelector = document.getElementById('bgSelector');
+
+        // Background images
+        let backgrounds = [
+            { id: 1, type: 'gradient', colors: ['#ff6b6b', '#feca57'] },
+            { id: 2, type: 'gradient', colors: ['#48dbfb', '#0abde3'] },
+            { id: 3, type: 'gradient', colors: ['#ff9ff3', '#feca57'] },
+            { id: 4, type: 'gradient', colors: ['#54a0ff', '#48dbfb'] },
+            { id: 5, type: 'gradient', colors: ['#5f27cd', '#341f97'] },
+            { id: 6, type: 'gradient', colors: ['#00d2d3', '#54a0ff'] }
+        ];
+
+        let selectedBg = backgrounds[0];
+
+        // File upload handler
+        document.getElementById('bgUpload').addEventListener('change', function(e) {
+            const files = e.target.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const newBg = {
+                        id: backgrounds.length + 1,
+                        type: 'image',
+                        src: event.target.result
+                    };
+                    backgrounds.push(newBg);
+                    
+                    // Re-render background selector
+                    bgSelector.innerHTML = '';
+                    initBackgrounds();
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Initialize background selector
+        function initBackgrounds() {
+            backgrounds.forEach(bg => {
+                const div = document.createElement('div');
+                div.className = 'bg-option';
+                if (bg.id === selectedBg.id) div.classList.add('selected');
+                
+                if (bg.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = bg.src;
+                    div.appendChild(img);
+                } else {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = 726;
+                    tempCanvas.height = 263;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    
+                    const gradient = tempCtx.createLinearGradient(0, 0, 726, 263);
+                    gradient.addColorStop(0, bg.colors[0]);
+                    gradient.addColorStop(1, bg.colors[1]);
+                    tempCtx.fillStyle = gradient;
+                    tempCtx.fillRect(0, 0, 726, 263);
+                    
+                    const img = document.createElement('img');
+                    img.src = tempCanvas.toDataURL();
+                    div.appendChild(img);
+                }
+                
+                div.onclick = () => selectBackground(bg, div);
+                bgSelector.appendChild(div);
+            });
+        }
+
+        function selectBackground(bg, element) {
+            selectedBg = bg;
+            document.querySelectorAll('.bg-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            updateCanvas();
+        }
+
+        function calculateFontSize(text, maxWidth, maxHeight, baseFontSize, fontFamily) {
+            let fontSize = baseFontSize;
+            ctx.font = `bold ${fontSize}px ${fontFamily}`;
+            
+            while (ctx.measureText(text).width > maxWidth && fontSize > 10) {
+                fontSize -= 2;
+                ctx.font = `bold ${fontSize}px ${fontFamily}`;
+            }
+            
+            return fontSize;
+        }
+
+        function drawText() {
+            const greeting = greetingInput.value.trim();
+            const name = nameInput.value.trim();
+            const additional = additionalInput.value.trim();
+            
+            if (!greeting && !name && !additional) return;
+            
+            // Calculate font sizes with different fonts
+            const greetingSize = greeting ? calculateFontSize(greeting, 650, 60, 40, "'Bebas Neue', Arial") : 0;
+            const nameSize = name ? calculateFontSize(name, 650, 100, 80, "Gistesy, cursive") : 0;
+            const additionalSize = additional ? calculateFontSize(additional, 650, 40, 24, "'Quicksand', sans-serif") : 0;
+            
+            // Calculate total height and spacing
+            const lineHeights = [];
+            if (greeting) lineHeights.push(greetingSize);
+            if (name) lineHeights.push(nameSize);
+            if (additional) lineHeights.push(additionalSize);
+            
+            const spacing = 15;
+            const totalHeight = lineHeights.reduce((sum, h) => sum + h, 0) + (lineHeights.length - 1) * spacing;
+            
+            let currentY = (canvas.height - totalHeight) / 2;
+            
+            // Draw text with shadow
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.fillStyle = fontColorInput.value;
+            
+            // Draw greeting with Bebas Neue
+            if (greeting) {
+                ctx.font = `bold ${greetingSize}px 'Bebas Neue', Arial`;
+                ctx.fillText(greeting, canvas.width / 2, currentY);
+                currentY += greetingSize + spacing;
+            }
+            
+            // Draw name with Gistesy
+            if (name) {
+                ctx.font = `${nameSize}px Gistesy, cursive`;
+                ctx.fillText(name, canvas.width / 2, currentY);
+                currentY += nameSize + spacing;
+            }
+            
+            // Draw additional with Quicksand
+            if (additional) {
+                ctx.font = `${additionalSize}px 'Quicksand', sans-serif`;
+                ctx.fillText(additional, canvas.width / 2, currentY);
+            }
+        }
+
+        function updateCanvas() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Reset shadow for background drawing
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Draw background
+            if (selectedBg.type === 'image') {
+                const img = new Image();
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, 726, 263);
+                    drawText();
+                };
+                img.src = selectedBg.src;
+            } else {
+                const gradient = ctx.createLinearGradient(0, 0, 726, 263);
+                gradient.addColorStop(0, selectedBg.colors[0]);
+                gradient.addColorStop(1, selectedBg.colors[1]);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, 726, 263);
+                drawText();
+            }
+        }
+
+        function downloadImage() {
+            // Force update canvas first
+            updateCanvas();
+            
+            // Wait for canvas to render (especially for images)
+            setTimeout(() => {
+                try {
+                    const link = document.createElement('a');
+                    link.download = 'greeting-card.png';
+                    link.href = canvas.toDataURL('image/png');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    alert('Download failed. Please try again.');
+                }
+            }, 500);
+        }
+
+        // Event listeners
+        greetingInput.addEventListener('input', updateCanvas);
+        nameInput.addEventListener('input', updateCanvas);
+        additionalInput.addEventListener('input', updateCanvas);
+        fontColorInput.addEventListener('input', updateCanvas);
+
+        // Initialize
+        initBackgrounds();
+        updateCanvas();
+    </script>
+</body>
+</html>
