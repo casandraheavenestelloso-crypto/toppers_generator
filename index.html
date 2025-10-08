@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @font-face {
             font-family: 'Gistesy';
@@ -81,6 +82,84 @@
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             cursor: pointer;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .color-choice, .shadow-color-choice {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .color-choice:hover, .shadow-color-choice:hover {
+            transform: scale(1.1);
+        }
+
+        .color-choice.selected, .shadow-color-choice.selected {
+            box-shadow: 0 0 0 3px #667eea;
+            transform: scale(1.1);
+        }
+
+        .position-btn {
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .position-btn:hover {
+            background: #5568d3;
+        }
+
+        .position-btn:active {
+            transform: scale(0.98);
         }
 
         .background-selector {
@@ -158,6 +237,102 @@
         .download-btn:active {
             transform: translateY(0);
         }
+
+        .saved-cards {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .saved-cards h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .saved-card {
+            position: relative;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .saved-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .saved-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .delete-card {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-card:hover {
+            background: #cc0000;
+        }
+
+        .add-card-btn {
+            width: 100%;
+            padding: 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .add-card-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .box-border-choice {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+}
+
+.box-border-choice:hover {
+    transform: scale(1.1);
+}
+
+.box-border-choice.selected {
+    box-shadow: 0 0 0 3px #667eea;
+    transform: scale(1.1);
+}
     </style>
 </head>
 <body>
@@ -182,7 +357,151 @@
 
             <div class="form-group">
                 <label for="fontColor">Font Color:</label>
-                <input type="color" id="fontColor" value="#ffffff">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, 50px); gap: 10px;">
+                    <div class="color-choice" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;"></div>
+                    <div class="color-choice" data-color="#cccccc" style="background: #cccccc;"></div>
+                    <div class="color-choice" data-color="#999999" style="background: #999999;"></div>
+                    <div class="color-choice" data-color="#666666" style="background: #666666;"></div>
+                    <div class="color-choice" data-color="#333333" style="background: #333333;"></div>
+                    <div class="color-choice" data-color="#000000" style="background: #000000;"></div>
+                    <div class="color-choice" data-color="#ff0000" style="background: #ff0000;"></div>
+                    <div class="color-choice" data-color="#cc0000" style="background: #cc0000;"></div>
+                    <div class="color-choice" data-color="#990000" style="background: #990000;"></div>
+                    <div class="color-choice" data-color="#00ff00" style="background: #00ff00;"></div>
+                    <div class="color-choice" data-color="#00cc00" style="background: #00cc00;"></div>
+                    <div class="color-choice" data-color="#009900" style="background: #009900;"></div>
+                    <div class="color-choice" data-color="#0000ff" style="background: #0000ff;"></div>
+                    <div class="color-choice" data-color="#0000cc" style="background: #0000cc;"></div>
+                    <div class="color-choice" data-color="#000099" style="background: #000099;"></div>
+                    <div class="color-choice" data-color="#ffff00" style="background: #ffff00;"></div>
+                    <div class="color-choice" data-color="#cccc00" style="background: #cccc00;"></div>
+                    <div class="color-choice" data-color="#999900" style="background: #999900;"></div>
+                    <div class="color-choice" data-color="#ff00ff" style="background: #ff00ff;"></div>
+                    <div class="color-choice" data-color="#cc00cc" style="background: #cc00cc;"></div>
+                    <div class="color-choice" data-color="#990099" style="background: #990099;"></div>
+                    <div class="color-choice" data-color="#00ffff" style="background: #00ffff;"></div>
+                    <div class="color-choice" data-color="#00cccc" style="background: #00cccc;"></div>
+                    <div class="color-choice" data-color="#009999" style="background: #009999;"></div>
+                    <div class="color-choice" data-color="#ffa500" style="background: #ffa500;"></div>
+                    <div class="color-choice" data-color="#ff8c00" style="background: #ff8c00;"></div>
+                    <div class="color-choice" data-color="#ff6600" style="background: #ff6600;"></div>
+                    <div class="color-choice" data-color="#800080" style="background: #800080;"></div>
+                    <div class="color-choice" data-color="#660066" style="background: #660066;"></div>
+                    <div class="color-choice" data-color="#4d004d" style="background: #4d004d;"></div>
+                    <div class="color-choice" data-color="#ffc0cb" style="background: #ffc0cb;"></div>
+                    <div class="color-choice" data-color="#ff69b4" style="background: #ff69b4;"></div>
+                    <div class="color-choice" data-color="#ff1493" style="background: #ff1493;"></div>
+                    <div class="color-choice" data-color="#a52a2a" style="background: #a52a2a;"></div>
+                    <div class="color-choice" data-color="#8b4513" style="background: #8b4513;"></div>
+                    <div class="color-choice" data-color="#654321" style="background: #654321;"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Text Shadow:</label>
+                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                        <input type="checkbox" id="shadowEnabled" checked style="width: 20px; height: 20px;">
+                        Enable Shadow
+                    </label>
+                </div>
+                <div id="shadowColorSection">
+                    <label style="font-size: 14px; margin-bottom: 8px; display: block;">Shadow Color:</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, 50px); gap: 10px;">
+                        <div class="shadow-color-choice" data-color="#000000" style="background: #000000;"></div>
+                        <div class="shadow-color-choice" data-color="#333333" style="background: #333333;"></div>
+                        <div class="shadow-color-choice" data-color="#666666" style="background: #666666;"></div>
+                        <div class="shadow-color-choice" data-color="#999999" style="background: #999999;"></div>
+                        <div class="shadow-color-choice" data-color="#cccccc" style="background: #cccccc;"></div>
+                        <div class="shadow-color-choice" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;"></div>
+                        <div class="shadow-color-choice" data-color="#ff0000" style="background: #ff0000;"></div>
+                        <div class="shadow-color-choice" data-color="#cc0000" style="background: #cc0000;"></div>
+                        <div class="shadow-color-choice" data-color="#0000ff" style="background: #0000ff;"></div>
+                        <div class="shadow-color-choice" data-color="#0000cc" style="background: #0000cc;"></div>
+                        <div class="shadow-color-choice" data-color="#ffa500" style="background: #ffa500;"></div>
+                        <div class="shadow-color-choice" data-color="#ff8c00" style="background: #ff8c00;"></div>
+                        <div class="shadow-color-choice" data-color="#800080" style="background: #800080;"></div>
+                        <div class="shadow-color-choice" data-color="#660066" style="background: #660066;"></div>
+                        <div class="shadow-color-choice" data-color="#00ff00" style="background: #00ff00;"></div>
+                        <div class="shadow-color-choice" data-color="#00cc00" style="background: #00cc00;"></div>
+                    </div>
+                </div>
+            </div>
+<div class="form-group">
+  <label>
+    <input type="checkbox" id="textBoxEnabled">
+    Enable Text Background Box
+  </label>
+</div>
+
+<div class="form-group" id="textBoxColors" style="display: none;">
+  <label>Box Border Color:</label>
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, 50px); gap: 10px;">
+    <div class="box-border-choice" data-color="#f59b7a" style="background: #f59b7a;"></div>
+    <div class="box-border-choice" data-color="#ff0000" style="background: #ff0000;"></div>
+    <div class="box-border-choice" data-color="#cc0000" style="background: #cc0000;"></div>
+    <div class="box-border-choice" data-color="#990000" style="background: #990000;"></div>
+    <div class="box-border-choice" data-color="#00ff00" style="background: #00ff00;"></div>
+    <div class="box-border-choice" data-color="#00cc00" style="background: #00cc00;"></div>
+    <div class="box-border-choice" data-color="#009900" style="background: #009900;"></div>
+    <div class="box-border-choice" data-color="#0000ff" style="background: #0000ff;"></div>
+    <div class="box-border-choice" data-color="#0000cc" style="background: #0000cc;"></div>
+    <div class="box-border-choice" data-color="#000099" style="background: #000099;"></div>
+    <div class="box-border-choice" data-color="#ffff00" style="background: #ffff00;"></div>
+    <div class="box-border-choice" data-color="#cccc00" style="background: #cccc00;"></div>
+    <div class="box-border-choice" data-color="#999900" style="background: #999900;"></div>
+    <div class="box-border-choice" data-color="#ff00ff" style="background: #ff00ff;"></div>
+    <div class="box-border-choice" data-color="#cc00cc" style="background: #cc00cc;"></div>
+    <div class="box-border-choice" data-color="#990099" style="background: #990099;"></div>
+    <div class="box-border-choice" data-color="#00ffff" style="background: #00ffff;"></div>
+    <div class="box-border-choice" data-color="#00cccc" style="background: #00cccc;"></div>
+    <div class="box-border-choice" data-color="#009999" style="background: #009999;"></div>
+    <div class="box-border-choice" data-color="#ffa500" style="background: #ffa500;"></div>
+    <div class="box-border-choice" data-color="#ff8c00" style="background: #ff8c00;"></div>
+    <div class="box-border-choice" data-color="#ff6600" style="background: #ff6600;"></div>
+    <div class="box-border-choice" data-color="#800080" style="background: #800080;"></div>
+    <div class="box-border-choice" data-color="#660066" style="background: #660066;"></div>
+    <div class="box-border-choice" data-color="#4d004d" style="background: #4d004d;"></div>
+    <div class="box-border-choice" data-color="#ffc0cb" style="background: #ffc0cb;"></div>
+    <div class="box-border-choice" data-color="#ff69b4" style="background: #ff69b4;"></div>
+    <div class="box-border-choice" data-color="#ff1493" style="background: #ff1493;"></div>
+    <div class="box-border-choice" data-color="#a52a2a" style="background: #a52a2a;"></div>
+    <div class="box-border-choice" data-color="#8b4513" style="background: #8b4513;"></div>
+    <div class="box-border-choice" data-color="#654321" style="background: #654321;"></div>
+    <div class="box-border-choice" data-color="#000000" style="background: #000000;"></div>
+    <div class="box-border-choice" data-color="#333333" style="background: #333333;"></div>
+    <div class="box-border-choice" data-color="#666666" style="background: #666666;"></div>
+    <div class="box-border-choice" data-color="#999999" style="background: #999999;"></div>
+    <div class="box-border-choice" data-color="#cccccc" style="background: #cccccc;"></div>
+    <div class="box-border-choice" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;"></div>
+  </div>
+</div>
+
+            <div class="form-group">
+                <label>Text Position:</label>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <button type="button" class="position-btn" onclick="moveText('left')">← Left</button>
+                    <button type="button" class="position-btn" onclick="moveText('right')">Right →</button>
+                    <button type="button" class="position-btn" onclick="moveText('up')">↑ Up</button>
+                    <button type="button" class="position-btn" onclick="moveText('down')">Down ↓</button>
+                </div>
+                <button type="button" class="position-btn" onclick="resetPosition()" style="margin-top: 10px; background: #666;">Reset Position</button>
+            </div>
+
+            <div class="form-group">
+                <label for="textScale">Text Size:</label>
+                <input type="range" id="textScale" min="0.5" max="2" step="0.1" value="1" style="width: 100%;">
+                <div style="text-align: center; margin-top: 5px; font-size: 14px; color: #666;">
+                    <span id="scaleValue">100%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="lineSpacing">Line Spacing:</label>
+                <input type="range" id="lineSpacing" min="0" max="50" value="15" style="width: 100%;">
+                <div style="text-align: center; margin-top: 5px; font-size: 14px; color: #666;">
+                    <span id="spacingValue">15px</span>
+                </div>
             </div>
 
             <div class="form-group">
@@ -201,217 +520,450 @@
             <canvas id="canvas" width="726" height="263"></canvas>
         </div>
 
-        <button class="download-btn" onclick="downloadImage()">📥 Download Image</button>
+        <button class="add-card-btn" onclick="addCard()">➕ Add Card to Collection</button>
+
+        <div class="saved-cards" id="savedCardsSection" style="display: none;">
+            <h3>Your Cards (<span id="cardCount">0</span>)</h3>
+            <div class="cards-grid" id="cardsGrid"></div>
+        </div>
+
+        <button class="download-btn" onclick="downloadPDF()">📄 Download as PDF</button>
     </div>
 
-    <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const greetingInput = document.getElementById('greeting');
-        const nameInput = document.getElementById('name');
-        const additionalInput = document.getElementById('additional');
-        const fontColorInput = document.getElementById('fontColor');
-        const bgSelector = document.getElementById('bgSelector');
+   <script>
+    const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const greetingInput = document.getElementById('greeting');
+const nameInput = document.getElementById('name');
+const additionalInput = document.getElementById('additional');
+const lineSpacingInput = document.getElementById('lineSpacing');
+const textScaleInput = document.getElementById('textScale');
+const shadowEnabledInput = document.getElementById('shadowEnabled');
+const bgSelector = document.getElementById('bgSelector');
+const textBoxEnabled = document.getElementById('textBoxEnabled');
 
-        // Background images
-        let backgrounds = [
-            { id: 1, type: 'gradient', colors: ['#ff6b6b', '#feca57'] },
-            { id: 2, type: 'gradient', colors: ['#48dbfb', '#0abde3'] },
-            { id: 3, type: 'gradient', colors: ['#ff9ff3', '#feca57'] },
-            { id: 4, type: 'gradient', colors: ['#54a0ff', '#48dbfb'] },
-            { id: 5, type: 'gradient', colors: ['#5f27cd', '#341f97'] },
-            { id: 6, type: 'gradient', colors: ['#00d2d3', '#54a0ff'] }
-        ];
+let fontColor = '#ffffff';
+let shadowColor = '#000000';
+let boxBorderColor = '#f59b7a';
+let posX = 0;
+let posY = 0;
+let savedCards = [];
 
-        let selectedBg = backgrounds[0];
+textBoxEnabled.addEventListener('change', () => {
+    document.getElementById('textBoxColors').style.display = textBoxEnabled.checked ? 'block' : 'none';
+    updateCanvas();
+});
 
-        // File upload handler
-        document.getElementById('bgUpload').addEventListener('change', function(e) {
-            const files = e.target.files;
-            
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const reader = new FileReader();
-                
-                reader.onload = function(event) {
-                    const newBg = {
-                        id: backgrounds.length + 1,
-                        type: 'image',
-                        src: event.target.result
-                    };
-                    backgrounds.push(newBg);
-                    
-                    // Re-render background selector
-                    bgSelector.innerHTML = '';
-                    initBackgrounds();
-                };
-                
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Initialize background selector
-        function initBackgrounds() {
-            backgrounds.forEach(bg => {
-                const div = document.createElement('div');
-                div.className = 'bg-option';
-                if (bg.id === selectedBg.id) div.classList.add('selected');
-                
-                if (bg.type === 'image') {
-                    const img = document.createElement('img');
-                    img.src = bg.src;
-                    div.appendChild(img);
-                } else {
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = 726;
-                    tempCanvas.height = 263;
-                    const tempCtx = tempCanvas.getContext('2d');
-                    
-                    const gradient = tempCtx.createLinearGradient(0, 0, 726, 263);
-                    gradient.addColorStop(0, bg.colors[0]);
-                    gradient.addColorStop(1, bg.colors[1]);
-                    tempCtx.fillStyle = gradient;
-                    tempCtx.fillRect(0, 0, 726, 263);
-                    
-                    const img = document.createElement('img');
-                    img.src = tempCanvas.toDataURL();
-                    div.appendChild(img);
-                }
-                
-                div.onclick = () => selectBackground(bg, div);
-                bgSelector.appendChild(div);
-            });
-        }
-
-        function selectBackground(bg, element) {
-            selectedBg = bg;
-            document.querySelectorAll('.bg-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            updateCanvas();
-        }
-
-        function calculateFontSize(text, maxWidth, maxHeight, baseFontSize, fontFamily) {
-            let fontSize = baseFontSize;
-            ctx.font = `bold ${fontSize}px ${fontFamily}`;
-            
-            while (ctx.measureText(text).width > maxWidth && fontSize > 10) {
-                fontSize -= 2;
-                ctx.font = `bold ${fontSize}px ${fontFamily}`;
-            }
-            
-            return fontSize;
-        }
-
-        function drawText() {
-            const greeting = greetingInput.value.trim();
-            const name = nameInput.value.trim();
-            const additional = additionalInput.value.trim();
-            
-            if (!greeting && !name && !additional) return;
-            
-            // Calculate font sizes with different fonts
-            const greetingSize = greeting ? calculateFontSize(greeting, 650, 60, 40, "'Bebas Neue', Arial") : 0;
-            const nameSize = name ? calculateFontSize(name, 650, 100, 80, "Gistesy, cursive") : 0;
-            const additionalSize = additional ? calculateFontSize(additional, 650, 40, 24, "'Quicksand', sans-serif") : 0;
-            
-            // Calculate total height and spacing
-            const lineHeights = [];
-            if (greeting) lineHeights.push(greetingSize);
-            if (name) lineHeights.push(nameSize);
-            if (additional) lineHeights.push(additionalSize);
-            
-            const spacing = 15;
-            const totalHeight = lineHeights.reduce((sum, h) => sum + h, 0) + (lineHeights.length - 1) * spacing;
-            
-            let currentY = (canvas.height - totalHeight) / 2;
-            
-            // Draw text with shadow
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
-            ctx.fillStyle = fontColorInput.value;
-            
-            // Draw greeting with Bebas Neue
-            if (greeting) {
-                ctx.font = `bold ${greetingSize}px 'Bebas Neue', Arial`;
-                ctx.fillText(greeting, canvas.width / 2, currentY);
-                currentY += greetingSize + spacing;
-            }
-            
-            // Draw name with Gistesy
-            if (name) {
-                ctx.font = `${nameSize}px Gistesy, cursive`;
-                ctx.fillText(name, canvas.width / 2, currentY);
-                currentY += nameSize + spacing;
-            }
-            
-            // Draw additional with Quicksand
-            if (additional) {
-                ctx.font = `${additionalSize}px 'Quicksand', sans-serif`;
-                ctx.fillText(additional, canvas.width / 2, currentY);
-            }
-        }
-
-        function updateCanvas() {
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Reset shadow for background drawing
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-            
-            // Draw background
-            if (selectedBg.type === 'image') {
-                const img = new Image();
-                img.onload = function() {
-                    ctx.drawImage(img, 0, 0, 726, 263);
-                    drawText();
-                };
-                img.src = selectedBg.src;
-            } else {
-                const gradient = ctx.createLinearGradient(0, 0, 726, 263);
-                gradient.addColorStop(0, selectedBg.colors[0]);
-                gradient.addColorStop(1, selectedBg.colors[1]);
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, 726, 263);
-                drawText();
-            }
-        }
-
-        function downloadImage() {
-            // Force update canvas first
-            updateCanvas();
-            
-            // Wait for canvas to render (especially for images)
-            setTimeout(() => {
-                try {
-                    const link = document.createElement('a');
-                    link.download = 'greeting-card.png';
-                    link.href = canvas.toDataURL('image/png');
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } catch (error) {
-                    console.error('Download failed:', error);
-                    alert('Download failed. Please try again.');
-                }
-            }, 500);
-        }
-
-        // Event listeners
-        greetingInput.addEventListener('input', updateCanvas);
-        nameInput.addEventListener('input', updateCanvas);
-        additionalInput.addEventListener('input', updateCanvas);
-        fontColorInput.addEventListener('input', updateCanvas);
-
-        // Initialize
-        initBackgrounds();
+// Box border color choice handler
+document.querySelectorAll('.box-border-choice').forEach(choice => {
+    if (choice.dataset.color === boxBorderColor) {
+        choice.classList.add('selected');
+    }
+    choice.addEventListener('click', function() {
+        document.querySelectorAll('.box-border-choice').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        boxBorderColor = this.dataset.color;
         updateCanvas();
-    </script>
+    });
+});
+
+// Update scale display
+textScaleInput.addEventListener('input', () => {
+    document.getElementById('scaleValue').textContent = Math.round(textScaleInput.value * 100) + '%';
+    updateCanvas();
+});
+
+// Update spacing display
+lineSpacingInput.addEventListener('input', () => {
+    document.getElementById('spacingValue').textContent = lineSpacingInput.value + 'px';
+    updateCanvas();
+});
+
+// Shadow enabled toggle
+shadowEnabledInput.addEventListener('change', updateCanvas);
+
+// Color choice handlers
+document.querySelectorAll('.color-choice').forEach(choice => {
+    if (choice.dataset.color === fontColor) {
+        choice.classList.add('selected');
+    }
+    choice.addEventListener('click', function() {
+        document.querySelectorAll('.color-choice').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        fontColor = this.dataset.color;
+        updateCanvas();
+    });
+});
+
+document.querySelectorAll('.shadow-color-choice').forEach(choice => {
+    if (choice.dataset.color === shadowColor) {
+        choice.classList.add('selected');
+    }
+    choice.addEventListener('click', function() {
+        document.querySelectorAll('.shadow-color-choice').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        shadowColor = this.dataset.color;
+        updateCanvas();
+    });
+});
+
+// Position movement functions
+function moveText(direction) {
+    const step = 10;
+    if (direction === 'left') posX -= step;
+    if (direction === 'right') posX += step;
+    if (direction === 'up') posY -= step;
+    if (direction === 'down') posY += step;
+    updateCanvas();
+}
+
+function resetPosition() {
+    posX = 0;
+    posY = 0;
+    updateCanvas();
+}
+
+function addCard() {
+    updateCanvas();
+    setTimeout(() => {
+        const cardData = canvas.toDataURL('image/png');
+        savedCards.push(cardData);
+        updateCardsDisplay();
+    }, 300);
+}
+
+function updateCardsDisplay() {
+    const section = document.getElementById('savedCardsSection');
+    const grid = document.getElementById('cardsGrid');
+    const count = document.getElementById('cardCount');
+    
+    if (savedCards.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    section.style.display = 'block';
+    count.textContent = savedCards.length;
+    
+    grid.innerHTML = '';
+    savedCards.forEach((cardData, index) => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'saved-card';
+        
+        const img = document.createElement('img');
+        img.src = cardData;
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-card';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            savedCards.splice(index, 1);
+            updateCardsDisplay();
+        };
+        
+        cardDiv.appendChild(img);
+        cardDiv.appendChild(deleteBtn);
+        grid.appendChild(cardDiv);
+    });
+}
+
+function downloadPDF() {
+    if (savedCards.length === 0) {
+        alert('Please add at least one card to your collection first!');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+    });
+
+    const a4Width = 210;
+    const cardWidth = 192.024;
+    const cardHeight = 69.596;
+    const verticalSpacing = 0;
+    const cardsPerPage = 4;
+
+    savedCards.forEach((cardData, index) => {
+        if (index > 0 && index % cardsPerPage === 0) {
+            pdf.addPage();
+        }
+
+        const positionOnPage = index % cardsPerPage;
+        const x = (a4Width - cardWidth) / 2;
+        const y = 10 + (positionOnPage * (cardHeight + verticalSpacing));
+
+        pdf.addImage(cardData, 'PNG', x, y, cardWidth, cardHeight);
+    });
+
+    pdf.save('greeting-cards.pdf');
+}
+
+// Background images
+let backgrounds = [
+    { id: 1, type: 'gradient', colors: ['#ff6b6b', '#feca57'] },
+    { id: 2, type: 'gradient', colors: ['#48dbfb', '#0abde3'] },
+    { id: 3, type: 'gradient', colors: ['#ff9ff3', '#feca57'] },
+    { id: 4, type: 'gradient', colors: ['#54a0ff', '#48dbfb'] },
+    { id: 5, type: 'gradient', colors: ['#5f27cd', '#341f97'] },
+    { id: 6, type: 'gradient', colors: ['#00d2d3', '#54a0ff'] }
+];
+
+let selectedBg = backgrounds[0];
+
+// File upload handler
+document.getElementById('bgUpload').addEventListener('change', function(e) {
+    const files = e.target.files;
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            const newBg = {
+                id: backgrounds.length + 1,
+                type: 'image',
+                src: event.target.result
+            };
+            backgrounds.push(newBg);
+            
+            bgSelector.innerHTML = '';
+            initBackgrounds();
+        };
+        
+        reader.readAsDataURL(file);
+    }
+});
+
+// Initialize background selector
+function initBackgrounds() {
+    backgrounds.forEach(bg => {
+        const div = document.createElement('div');
+        div.className = 'bg-option';
+        if (bg.id === selectedBg.id) div.classList.add('selected');
+        
+        if (bg.type === 'image') {
+            const img = document.createElement('img');
+            img.src = bg.src;
+            div.appendChild(img);
+        } else {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 726;
+            tempCanvas.height = 263;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            const gradient = tempCtx.createLinearGradient(0, 0, 726, 263);
+            gradient.addColorStop(0, bg.colors[0]);
+            gradient.addColorStop(1, bg.colors[1]);
+            tempCtx.fillStyle = gradient;
+            tempCtx.fillRect(0, 0, 726, 263);
+            
+            const img = document.createElement('img');
+            img.src = tempCanvas.toDataURL();
+            div.appendChild(img);
+        }
+        
+        div.onclick = () => selectBackground(bg, div);
+        bgSelector.appendChild(div);
+    });
+}
+
+function selectBackground(bg, element) {
+    selectedBg = bg;
+    document.querySelectorAll('.bg-option').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    updateCanvas();
+}
+
+function calculateFontSize(text, maxWidth, maxHeight, baseFontSize, fontFamily) {
+    let fontSize = baseFontSize;
+    ctx.font = `bold ${fontSize}px ${fontFamily}`;
+    
+    while (ctx.measureText(text).width > maxWidth && fontSize > 10) {
+        fontSize -= 2;
+        ctx.font = `bold ${fontSize}px ${fontFamily}`;
+    }
+    
+    return fontSize;
+}
+
+function drawText() {
+    const greeting = greetingInput.value.trim();
+    const name = nameInput.value.trim();
+    const additional = additionalInput.value.trim();
+    
+    if (!greeting && !name && !additional) return;
+    
+    // Get scale factor
+    const scale = parseFloat(textScaleInput.value);
+    
+    // Base sizes multiplied by scale
+    const baseGreetingSize = 40 * scale;
+    const baseNameSize = 80 * scale;
+    const baseAdditionalSize = 24 * scale;
+    
+    // Calculate font sizes with different fonts
+    const greetingSize = greeting ? calculateFontSize(greeting, 650, 60, baseGreetingSize, "'Bebas Neue', Arial") : 0;
+    const nameSize = name ? calculateFontSize(name, 650, 100, baseNameSize, "'Dancing Script', cursive") : 0;
+    const additionalSize = additional ? calculateFontSize(additional, 650, 40, baseAdditionalSize, "'Quicksand', sans-serif") : 0;
+    
+    // Calculate total height and spacing FIRST
+    const lineHeights = [];
+    if (greeting) lineHeights.push(greetingSize);
+    if (name) lineHeights.push(nameSize);
+    if (additional) lineHeights.push(additionalSize);
+    
+    const spacing = parseInt(lineSpacingInput.value);
+    const totalHeight = lineHeights.reduce((sum, h) => sum + h, 0) + (lineHeights.length - 1) * spacing;
+    
+    // NOW draw text box if enabled (after totalHeight is calculated)
+ // NOW draw text box if enabled (after totalHeight is calculated)
+if (textBoxEnabled.checked) {
+    const paddingX = 40;
+    const paddingY = 30;
+    
+    // Calculate the actual max width of all text lines
+    let maxTextWidth = 0;
+    
+    if (greeting) {
+        ctx.font = `bold ${greetingSize}px 'Bebas Neue', Arial`;
+        maxTextWidth = Math.max(maxTextWidth, ctx.measureText(greeting).width);
+    }
+    if (name) {
+        ctx.font = `bold ${nameSize}px 'Dancing Script', cursive`;
+        maxTextWidth = Math.max(maxTextWidth, ctx.measureText(name).width);
+    }
+    if (additional) {
+        ctx.font = `${additionalSize}px 'Quicksand', sans-serif`;
+        maxTextWidth = Math.max(maxTextWidth, ctx.measureText(additional).width);
+    }
+    
+const boxWidth = maxTextWidth + paddingX * 2;
+const boxHeight = totalHeight + paddingY * 2;
+
+const boxX = (canvas.width - boxWidth) / 2 + posX;
+const boxY = (canvas.height - boxHeight) / 2 + posY;
+
+const borderInset = 15; // Border is 5px inside the white background
+
+        // Save current shadow settings
+        const savedShadowColor = ctx.shadowColor;
+        const savedShadowBlur = ctx.shadowBlur;
+        const savedShadowOffsetX = ctx.shadowOffsetX;
+        const savedShadowOffsetY = ctx.shadowOffsetY;
+
+        // Clear shadow for box drawing
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+// Draw white fill
+ctx.fillStyle = '#ffffff';
+ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+// Draw border 5px inside
+ctx.lineWidth = 4;
+ctx.strokeStyle = boxBorderColor;
+ctx.strokeRect(
+    boxX + borderInset, 
+    boxY + borderInset, 
+    boxWidth - (borderInset * 2), 
+    boxHeight - (borderInset * 2)
+);
+
+        // Restore shadow settings for text
+        ctx.shadowColor = savedShadowColor;
+        ctx.shadowBlur = savedShadowBlur;
+        ctx.shadowOffsetX = savedShadowOffsetX;
+        ctx.shadowOffsetY = savedShadowOffsetY;
+    }
+    
+    let currentY = (canvas.height - totalHeight) / 2 + posY;
+    const centerX = canvas.width / 2 + posX;
+    
+    // Draw text with shadow
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    
+    // Apply shadow if enabled
+    if (shadowEnabledInput.checked) {
+        const r = parseInt(shadowColor.slice(1, 3), 16);
+        const g = parseInt(shadowColor.slice(3, 5), 16);
+        const b = parseInt(shadowColor.slice(5, 7), 16);
+        ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.5)`;
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+    } else {
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+    }
+    
+    ctx.fillStyle = fontColor;
+    
+    // Draw greeting with Bebas Neue
+    if (greeting) {
+        ctx.font = `bold ${greetingSize}px 'Bebas Neue', Arial`;
+        ctx.fillText(greeting, centerX, currentY);
+        currentY += greetingSize + spacing;
+    }
+    
+    // Draw name with Dancing Script
+    if (name) {
+        ctx.font = `bold ${nameSize}px 'Dancing Script', cursive`;
+        ctx.fillText(name, centerX, currentY);
+        currentY += nameSize + spacing;
+    }
+    
+    // Draw additional with Quicksand
+    if (additional) {
+        ctx.font = `${additionalSize}px 'Quicksand', sans-serif`;
+        ctx.fillText(additional, centerX, currentY);
+    }
+}
+
+function updateCanvas() {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Reset shadow for background drawing
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    // Draw background
+    if (selectedBg.type === 'image') {
+        const img = new Image();
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, 726, 263);
+            drawText();
+        };
+        img.src = selectedBg.src;
+    } else {
+        const gradient = ctx.createLinearGradient(0, 0, 726, 263);
+        gradient.addColorStop(0, selectedBg.colors[0]);
+        gradient.addColorStop(1, selectedBg.colors[1]);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 726, 263);
+        drawText();
+    }
+}
+
+// Event listeners
+greetingInput.addEventListener('input', updateCanvas);
+nameInput.addEventListener('input', updateCanvas);
+additionalInput.addEventListener('input', updateCanvas);
+
+// Initialize
+initBackgrounds();
+updateCanvas();
+   </script>
 </body>
 </html>
