@@ -841,7 +841,8 @@ if (textBoxEnabled.checked) {
         maxTextWidth = Math.max(maxTextWidth, ctx.measureText(additional).width);
     }
     
-const boxWidth = maxTextWidth + paddingX * 2;
+const minBoxWidth = 586; // Minimum width in pixels (adjust as needed)
+const boxWidth = Math.max(maxTextWidth + paddingX * 2, minBoxWidth);
 const boxHeight = totalHeight + paddingY * 2;
 
 const boxX = (canvas.width - boxWidth) / 2 + posX;
