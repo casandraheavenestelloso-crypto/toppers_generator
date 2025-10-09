@@ -1001,27 +1001,26 @@ function updateCanvas() {
         ctx.textBaseline = "middle";
 
         const baseFontSize = 40 * textScale;
-        const nameFontFamily = "Gistesy, cursive";  // fallback
+        const nameFontFamily = "Gistesy, cursive";
         const greetingFontFamily = "Bebas Neue";
         const addFontFamily = "Quicksand";
 
-        // Fit name dynamically to 70% width and 40% height of canvas
         const maxNameWidth = canvas.width * 0.7;
         const maxNameHeight = canvas.height * 0.4;
         const { fontSize: adjustedNameSize, lines: nameLines } = calculateFittingFont(
             ctx, name, maxNameWidth, maxNameHeight, 80 * textScale, nameFontFamily
         );
 
-        // Calculate total height dynamically (tighter spacing for multiline name)
+        // tighter vertical stack
         const totalHeight =
-            (greeting ? baseFontSize + lineSpacing : 0) +
-            (nameLines.length * adjustedNameSize * 1.1) +
-            (additional ? baseFontSize * 0.8 + lineSpacing : 0);
+            (greeting ? baseFontSize + lineSpacing * 0.6 : 0) +
+            (nameLines.length * adjustedNameSize * 1.05) +
+            (additional ? baseFontSize * 0.8 + lineSpacing * 0.4 : 0);
 
         const centerY = canvas.height / 2 + posY;
         let y = centerY - totalHeight / 2;
 
-        // Text background box with fill + border
+        // solid white box with inner border inset 10px
         if (textBoxEnabled.checked) {
             const boxPadding = 20;
             const boxWidth = canvas.width * 0.9;
@@ -1029,14 +1028,20 @@ function updateCanvas() {
             const boxX = (canvas.width - boxWidth) / 2;
             const boxY = centerY - boxHeight / 2;
 
-            // background fill
-            ctx.fillStyle = "rgba(255,255,255,0.7)";
+            // solid white background
+            ctx.fillStyle = "#ffffff";
             ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
 
-            // border
+            // inner border inset 10px
+            const inset = 10;
             ctx.strokeStyle = boxBorderColor;
             ctx.lineWidth = 4;
-            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+            ctx.strokeRect(
+                boxX + inset,
+                boxY + inset,
+                boxWidth - inset * 2,
+                boxHeight - inset * 2
+            );
         }
 
         // Shadows
@@ -1055,7 +1060,7 @@ function updateCanvas() {
         if (greeting) {
             ctx.font = `${baseFontSize}px ${greetingFontFamily}`;
             ctx.fillText(greeting, canvas.width / 2 + posX, y);
-            y += baseFontSize + lineSpacing;
+            y += baseFontSize + lineSpacing * 0.6;
         }
 
         // Name text (auto-wrap + auto-resize)
@@ -1063,13 +1068,13 @@ function updateCanvas() {
             ctx.font = `${adjustedNameSize}px ${nameFontFamily}`;
             nameLines.forEach(line => {
                 ctx.fillText(line, canvas.width / 2 + posX, y);
-                y += adjustedNameSize * 1.1; // reduced multiplier
+                y += adjustedNameSize * 1.05;
             });
         }
 
-        // Additional text (closer to name)
+        // Additional text (tightened spacing)
         if (additional) {
-            y += lineSpacing * 0.8; // less gap before additional
+            y += lineSpacing * 0.3;
             ctx.font = `${baseFontSize * 0.8}px ${addFontFamily}`;
             ctx.fillText(additional, canvas.width / 2 + posX, y);
         }
@@ -1077,6 +1082,7 @@ function updateCanvas() {
         ctx.shadowColor = "transparent";
     };
 }
+
 
 
 [greetingInput, nameInput, additionalInput].forEach(input =>
@@ -1089,3 +1095,4 @@ updateCanvas();
     </script>
 </body>
 </html>
+
