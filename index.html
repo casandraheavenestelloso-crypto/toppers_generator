@@ -998,7 +998,7 @@ function updateCanvas() {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
+        ctx.textBaseline = "alphabetic";
 
         const baseFontSize = 40 * textScale;
         const nameFontFamily = "Gistesy, cursive";
@@ -1011,14 +1011,15 @@ function updateCanvas() {
             ctx, name, maxNameWidth, maxNameHeight, 80 * textScale, nameFontFamily
         );
 
-        // tighter vertical stack
-        const totalHeight =
-            (greeting ? baseFontSize + lineSpacing * 0.6 : 0) +
-            (nameLines.length * adjustedNameSize * 1.05) +
-            (additional ? baseFontSize * 0.8 + lineSpacing * 0.4 : 0);
+        // adaptive spacing based on how many lines the name has
+        const nameLineMultiplier = nameLines.length > 1 ? 1.05 : 1.0;
+        const greetingHeight = greeting ? baseFontSize + lineSpacing * 0.4 : 0;
+        const nameHeight = nameLines.length * adjustedNameSize * nameLineMultiplier;
+        const addHeight = additional ? baseFontSize * 0.8 + lineSpacing * 0.3 : 0;
+        const totalHeight = greetingHeight + nameHeight + addHeight;
 
         const centerY = canvas.height / 2 + posY;
-        let y = centerY - totalHeight / 2;
+        let y = centerY - totalHeight / 2 + adjustedNameSize * 0.15;
 
         // solid white box with inner border inset 10px
         if (textBoxEnabled.checked) {
@@ -1028,11 +1029,9 @@ function updateCanvas() {
             const boxX = (canvas.width - boxWidth) / 2;
             const boxY = centerY - boxHeight / 2;
 
-            // solid white background
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
 
-            // inner border inset 10px
             const inset = 10;
             ctx.strokeStyle = boxBorderColor;
             ctx.lineWidth = 4;
@@ -1044,7 +1043,6 @@ function updateCanvas() {
             );
         }
 
-        // Shadows
         if (shadowEnabledInput.checked) {
             ctx.shadowColor = shadowColor;
             ctx.shadowBlur = 10;
@@ -1060,7 +1058,7 @@ function updateCanvas() {
         if (greeting) {
             ctx.font = `${baseFontSize}px ${greetingFontFamily}`;
             ctx.fillText(greeting, canvas.width / 2 + posX, y);
-            y += baseFontSize + lineSpacing * 0.6;
+            y += baseFontSize + lineSpacing * 0.4;
         }
 
         // Name text (auto-wrap + auto-resize)
@@ -1068,13 +1066,13 @@ function updateCanvas() {
             ctx.font = `${adjustedNameSize}px ${nameFontFamily}`;
             nameLines.forEach(line => {
                 ctx.fillText(line, canvas.width / 2 + posX, y);
-                y += adjustedNameSize * 1.05;
+                y += adjustedNameSize * nameLineMultiplier;
             });
         }
 
-        // Additional text (tightened spacing)
+        // Additional text (tighter spacing)
         if (additional) {
-            y += lineSpacing * 0.3;
+            y += lineSpacing * 0.2;
             ctx.font = `${baseFontSize * 0.8}px ${addFontFamily}`;
             ctx.fillText(additional, canvas.width / 2 + posX, y);
         }
@@ -1082,8 +1080,6 @@ function updateCanvas() {
         ctx.shadowColor = "transparent";
     };
 }
-
-
 
 [greetingInput, nameInput, additionalInput].forEach(input =>
     input.addEventListener('input', updateCanvas)
@@ -1095,4 +1091,5 @@ updateCanvas();
     </script>
 </body>
 </html>
+
 
