@@ -1027,7 +1027,7 @@ function updateCanvas() {
         const addHeight = additional ? baseFontSize * 0.8 : 0;
 
         const gapGreetingToName = greeting ? lineSpacing * 0.8 : 0;
-        const gapNameToAdd = nameLineCount > 1 ? lineSpacing * 0.6 : lineSpacing * 0.3;
+        const gapNameToAdd = nameLineCount > 1 ? lineSpacing * 0.7 : lineSpacing * 0.3;
 
         const totalHeight =
             greetingHeight +
@@ -1041,7 +1041,7 @@ function updateCanvas() {
 
         // ✅ Fine-tune offset for one-line names
         // One-line names have less visual weight, so we lift slightly
-        const visualAdjustment = nameLineCount === 1 ? adjustedNameSize * 0.3 : 0;
+        const visualAdjustment = nameLineCount === 1 ? adjustedNameSize * 0.4 : 0;
         let y = centerY - totalHeight / 2 + visualAdjustment;
 
         // --- Background box with inset border ---
@@ -1118,6 +1118,7 @@ updateCanvas();
     </script>
 </body>
 </html>
+
 
 
 
