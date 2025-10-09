@@ -342,55 +342,6 @@
             transform: scale(1.1);
         }
 
-        .success-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: white;
-            padding: 30px 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .success-popup.show {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .success-popup .check-icon {
-            font-size: 60px;
-            color: #28a745;
-            margin-bottom: 15px;
-        }
-
-        .success-popup h3 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-
-        .success-popup p {
-            color: #666;
-            font-size: 16px;
-        }
-
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none;
-        }
-
-        .popup-overlay.show {
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -589,12 +540,6 @@
         <button class="download-btn" onclick="downloadPDF()">📄 Download as PDF</button>
     </div>
 
-    <div class="popup-overlay" id="popupOverlay"></div>
-    <div class="success-popup" id="successPopup">
-        <div class="check-icon">✓</div>
-        <h3>Success!</h3>
-        <p>Your PDF has been downloaded successfully.</p>
-    </div>
 
     <script>
 const canvas = document.getElementById('canvas');
@@ -1048,6 +993,106 @@ additionalInput.addEventListener('input', updateCanvas);
 
 initBackgrounds();
 updateCanvas();
+
+function calculateFontSize(text, maxWidth, maxHeight, baseFontSize, fontFamily) {
+    let fontSize = baseFontSize;
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    let textWidth = ctx.measureText(text).width;
+
+    // Decrease font size until text fits within width
+    while (textWidth > maxWidth && fontSize > 10) {
+        fontSize -= 1;
+        ctx.font = `${fontSize}px ${fontFamily}`;
+        textWidth = ctx.measureText(text).width;
+    }
+
+    return fontSize;
+}
+
+function updateCanvas() {
+    const greeting = greetingInput.value.trim();
+    const name = nameInput.value.trim();
+    const additional = additionalInput.value.trim();
+    const lineSpacing = parseInt(lineSpacingInput.value);
+    const textScale = parseFloat(textScaleInput.value);
+
+    const img = new Image();
+    img.src = selectedBg.src;
+    img.onload = function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        const baseFontSize = 40 * textScale;
+        const nameFontFamily = "Gistesy";
+        const greetingFontFamily = "Bebas Neue";
+        const addFontFamily = "Quicksand";
+
+        // Auto-adjust font size for name text to fit nicely
+        const maxNameWidth = canvas.width * 0.8;
+        const adjustedNameSize = calculateFontSize(name, maxNameWidth, canvas.height, 80 * textScale, nameFontFamily);
+
+        const totalHeight = baseFontSize + adjustedNameSize + 30;
+        const centerY = canvas.height / 2 + posY;
+        let y = centerY - totalHeight / 2;
+
+        // Optional text background box
+        if (textBoxEnabled.checked) {
+            const boxPadding = 20;
+            const boxWidth = canvas.width * 0.9;
+            const boxHeight = totalHeight + 40;
+            const boxX = (canvas.width - boxWidth) / 2;
+            const boxY = centerY - boxHeight / 2;
+
+            ctx.strokeStyle = boxBorderColor;
+            ctx.lineWidth = 5;
+            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+        }
+
+        if (shadowEnabledInput.checked) {
+            ctx.shadowColor = shadowColor;
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+        } else {
+            ctx.shadowColor = "transparent";
+        }
+
+        ctx.fillStyle = fontColor;
+
+        // Greeting text
+        if (greeting) {
+            ctx.font = `${baseFontSize}px ${greetingFontFamily}`;
+            ctx.fillText(greeting, canvas.width / 2 + posX, y);
+            y += baseFontSize + lineSpacing;
+        }
+
+        // Name text (auto-scaled)
+        if (name) {
+            ctx.font = `${adjustedNameSize}px ${nameFontFamily}`;
+            ctx.fillText(name, canvas.width / 2 + posX, y);
+            y += adjustedNameSize + lineSpacing;
+        }
+
+        // Additional text
+        if (additional) {
+            ctx.font = `${baseFontSize * 0.8}px ${addFontFamily}`;
+            ctx.fillText(additional, canvas.width / 2 + posX, y);
+        }
+
+        ctx.shadowColor = "transparent";
+    };
+}
+
+[greetingInput, nameInput, additionalInput].forEach(input =>
+    input.addEventListener('input', updateCanvas)
+);
+
+initBackgrounds();
+updateCanvas();
+
     </script>
 </body>
 </html>
