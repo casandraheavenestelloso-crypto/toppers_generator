@@ -950,63 +950,38 @@ function drawText() {
     }
 }
 
-function updateCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    
-    const img = new Image();
-    img.crossOrigin = 'anonymous'; // Enable CORS
-    img.onload = function() {
-        // Calculate cover dimensions
-        const canvasRatio = canvas.width / canvas.height;
-        const imgRatio = img.width / img.height;
-        
-        let drawWidth, drawHeight, offsetX, offsetY;
-        
-        if (imgRatio > canvasRatio) {
-            // Image is wider, fit to height
-            drawHeight = canvas.height;
-            drawWidth = img.width * (canvas.height / img.height);
-            offsetX = (canvas.width - drawWidth) / 2;
-            offsetY = 0;
+function wrapText(ctx, text, maxWidth, fontSize, fontFamily) {
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+        const testLine = currentLine + ' ' + words[i];
+        const testWidth = ctx.measureText(testLine).width;
+        if (testWidth < maxWidth) {
+            currentLine = testLine;
         } else {
-            // Image is taller, fit to width
-            drawWidth = canvas.width;
-            drawHeight = img.height * (canvas.width / img.width);
-            offsetX = 0;
-            offsetY = (canvas.height - drawHeight) / 2;
+            lines.push(currentLine);
+            currentLine = words[i];
         }
-        
-        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-        drawText();
-    };
-    img.src = selectedBg.src;
+    }
+    lines.push(currentLine);
+    return lines;
 }
 
-greetingInput.addEventListener('input', updateCanvas);
-nameInput.addEventListener('input', updateCanvas);
-additionalInput.addEventListener('input', updateCanvas);
-
-initBackgrounds();
-updateCanvas();
-
-function calculateFontSize(text, maxWidth, maxHeight, baseFontSize, fontFamily) {
+function calculateFittingFont(ctx, text, maxWidth, maxHeight, baseFontSize, fontFamily) {
     let fontSize = baseFontSize;
-    ctx.font = `${fontSize}px ${fontFamily}`;
-    let textWidth = ctx.measureText(text).width;
+    let lines = wrapText(ctx, text, maxWidth, fontSize, fontFamily);
 
-    // Decrease font size until text fits within width
-    while (textWidth > maxWidth && fontSize > 10) {
+    // Reduce font size until both width and height fit
+    while ((lines.length * fontSize * 1.2) > maxHeight || lines.some(line => ctx.measureText(line).width > maxWidth)) {
         fontSize -= 1;
-        ctx.font = `${fontSize}px ${fontFamily}`;
-        textWidth = ctx.measureText(text).width;
+        if (fontSize <= 10) break;
+        lines = wrapText(ctx, text, maxWidth, fontSize, fontFamily);
     }
 
-    return fontSize;
+    return { fontSize, lines };
 }
 
 function updateCanvas() {
@@ -1030,22 +1005,28 @@ function updateCanvas() {
         const greetingFontFamily = "Bebas Neue";
         const addFontFamily = "Quicksand";
 
-        // Auto-adjust font size for name text to fit nicely
-        const maxNameWidth = canvas.width * 0.8;
-        const adjustedNameSize = calculateFontSize(name, maxNameWidth, canvas.height, 80 * textScale, nameFontFamily);
+        // Fit name dynamically to 70% width and 40% height of canvas
+        const maxNameWidth = canvas.width * 0.7;
+        const maxNameHeight = canvas.height * 0.4;
+        const { fontSize: adjustedNameSize, lines: nameLines } = calculateFittingFont(
+            ctx, name, maxNameWidth, maxNameHeight, 80 * textScale, nameFontFamily
+        );
 
-        const totalHeight = baseFontSize + adjustedNameSize + 30;
+        // Calculate total height dynamically
+        const totalHeight =
+            (greeting ? baseFontSize + lineSpacing : 0) +
+            (nameLines.length * adjustedNameSize * 1.2) +
+            (additional ? baseFontSize * 0.8 + lineSpacing : 0);
+
         const centerY = canvas.height / 2 + posY;
         let y = centerY - totalHeight / 2;
 
-        // Optional text background box
         if (textBoxEnabled.checked) {
             const boxPadding = 20;
             const boxWidth = canvas.width * 0.9;
             const boxHeight = totalHeight + 40;
             const boxX = (canvas.width - boxWidth) / 2;
             const boxY = centerY - boxHeight / 2;
-
             ctx.strokeStyle = boxBorderColor;
             ctx.lineWidth = 5;
             ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
@@ -1069,11 +1050,14 @@ function updateCanvas() {
             y += baseFontSize + lineSpacing;
         }
 
-        // Name text (auto-scaled)
+        // Name text (auto-wrap + auto-resize)
         if (name) {
             ctx.font = `${adjustedNameSize}px ${nameFontFamily}`;
-            ctx.fillText(name, canvas.width / 2 + posX, y);
-            y += adjustedNameSize + lineSpacing;
+            nameLines.forEach(line => {
+                ctx.fillText(line, canvas.width / 2 + posX, y);
+                y += adjustedNameSize * 1.2;
+            });
+            y += lineSpacing;
         }
 
         // Additional text
