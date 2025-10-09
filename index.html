@@ -993,6 +993,7 @@ function updateCanvas() {
 
     const img = new Image();
     img.src = selectedBg.src;
+
     img.onload = async function() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -1005,27 +1006,42 @@ function updateCanvas() {
         const greetingFontFamily = "Bebas Neue";
         const addFontFamily = "Quicksand";
 
+        // --- Calculate name fit and wrapping ---
         const maxNameWidth = canvas.width * 0.7;
         const maxNameHeight = canvas.height * 0.4;
         const { fontSize: adjustedNameSize, lines: nameLines } = calculateFittingFont(
             ctx, name, maxNameWidth, maxNameHeight, 80 * textScale, nameFontFamily
         );
 
-        // adaptive spacing based on how many lines the name has
-        const nameLineMultiplier = nameLines.length > 1 ? 1.05 : 1.0;
-        const greetingHeight = greeting ? baseFontSize + lineSpacing * 0.4 : 0;
-        const nameHeight = nameLines.length * adjustedNameSize * nameLineMultiplier;
-        const addHeight = additional ? baseFontSize * 0.8 + lineSpacing * 0.3 : 0;
-        const totalHeight = greetingHeight + nameHeight + addHeight;
+        // Determine actual number of lines
+        const nameLineCount = nameLines.length;
+        const nameLineHeight = adjustedNameSize * (nameLineCount > 1 ? 1.05 : 1.0);
 
+        // Determine total height of all text elements
+        const greetingHeight = greeting ? baseFontSize : 0;
+        const nameHeight = nameLineCount * nameLineHeight;
+        const addHeight = additional ? baseFontSize * 0.8 : 0;
+
+        // Adjust vertical gaps depending on single or multi-line
+        const gapGreetingToName = greeting ? lineSpacing * 0.4 : 0;
+        const gapNameToAdd = nameLineCount > 1 ? lineSpacing * 0.3 : lineSpacing * 0.1;
+
+        const totalHeight =
+            greetingHeight +
+            gapGreetingToName +
+            nameHeight +
+            gapNameToAdd +
+            addHeight;
+
+        // Perfectly center vertically
         const centerY = canvas.height / 2 + posY;
-        let y = centerY - totalHeight / 2 + adjustedNameSize * 0.15;
+        let y = centerY - totalHeight / 2;
 
-        // solid white box with inner border inset 10px
+        // --- Draw solid white background with inset border ---
         if (textBoxEnabled.checked) {
-            const boxPadding = 20;
+            const boxPadding = 30;
             const boxWidth = canvas.width * 0.9;
-            const boxHeight = totalHeight + 40;
+            const boxHeight = totalHeight + boxPadding * 1.2;
             const boxX = (canvas.width - boxWidth) / 2;
             const boxY = centerY - boxHeight / 2;
 
@@ -1043,6 +1059,7 @@ function updateCanvas() {
             );
         }
 
+        // Shadow
         if (shadowEnabledInput.checked) {
             ctx.shadowColor = shadowColor;
             ctx.shadowBlur = 10;
@@ -1054,32 +1071,35 @@ function updateCanvas() {
 
         ctx.fillStyle = fontColor;
 
-        // Greeting text
+        // --- Greeting text ---
         if (greeting) {
             ctx.font = `${baseFontSize}px ${greetingFontFamily}`;
+            y += baseFontSize;
             ctx.fillText(greeting, canvas.width / 2 + posX, y);
-            y += baseFontSize + lineSpacing * 0.4;
+            y += gapGreetingToName;
         }
 
-        // Name text (auto-wrap + auto-resize)
+        // --- Name text ---
         if (name) {
             ctx.font = `${adjustedNameSize}px ${nameFontFamily}`;
             nameLines.forEach(line => {
+                y += adjustedNameSize;
                 ctx.fillText(line, canvas.width / 2 + posX, y);
-                y += adjustedNameSize * nameLineMultiplier;
             });
+            y += gapNameToAdd;
         }
 
-        // Additional text (tighter spacing)
+        // --- Additional text ---
         if (additional) {
-            y += lineSpacing * 0.2;
             ctx.font = `${baseFontSize * 0.8}px ${addFontFamily}`;
+            y += baseFontSize * 0.8;
             ctx.fillText(additional, canvas.width / 2 + posX, y);
         }
 
         ctx.shadowColor = "transparent";
     };
 }
+
 
 [greetingInput, nameInput, additionalInput].forEach(input =>
     input.addEventListener('input', updateCanvas)
@@ -1091,5 +1111,6 @@ updateCanvas();
     </script>
 </body>
 </html>
+
 
 
