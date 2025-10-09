@@ -756,22 +756,7 @@ function downloadPDF() {
         pdf.addImage(cardData, 'PNG', x, y, cardWidth, cardHeight);
     });
 
-    // ✅ Show success popup FIRST (before save), for mobile compatibility
-    const overlay = document.getElementById('popupOverlay');
-    const popup = document.getElementById('successPopup');
-    overlay.classList.add('show');
-    popup.classList.add('show');
-
-    // Hide popup after 2 seconds
-    setTimeout(() => {
-        overlay.classList.remove('show');
-        popup.classList.remove('show');
-    }, 2000);
-
-    // ✅ Delay save slightly so popup can appear first
-    setTimeout(() => {
-        pdf.save('greeting-cards.pdf');
-    }, 300);
+    pdf.save('greeting-cards.pdf');
 }
 
 
