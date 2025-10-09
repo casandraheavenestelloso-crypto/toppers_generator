@@ -994,7 +994,7 @@ function updateCanvas() {
     const img = new Image();
     img.src = selectedBg.src;
 
-    img.onload = async function() {
+    img.onload = async function () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
@@ -1010,7 +1010,12 @@ function updateCanvas() {
         const maxNameWidth = canvas.width * 0.7;
         const maxNameHeight = canvas.height * 0.4;
         const { fontSize: adjustedNameSize, lines: nameLines } = calculateFittingFont(
-            ctx, name, maxNameWidth, maxNameHeight, 80 * textScale, nameFontFamily
+            ctx,
+            name,
+            maxNameWidth,
+            maxNameHeight,
+            80 * textScale,
+            nameFontFamily
         );
 
         const nameLineCount = nameLines.length;
@@ -1021,9 +1026,8 @@ function updateCanvas() {
         const nameHeight = nameLineCount * nameLineHeight;
         const addHeight = additional ? baseFontSize * 0.8 : 0;
 
-        // Loosen spacing slightly
         const gapGreetingToName = greeting ? lineSpacing * 0.8 : 0;
-        const gapNameToAdd = nameLineCount > 1 ? lineSpacing * 0.6 : lineSpacing * 0.4;
+        const gapNameToAdd = nameLineCount > 1 ? lineSpacing * 0.6 : lineSpacing * 0.3;
 
         const totalHeight =
             greetingHeight +
@@ -1032,11 +1036,15 @@ function updateCanvas() {
             gapNameToAdd +
             addHeight;
 
-        // Lift up slightly (visually centered)
-        const centerY = canvas.height / 2 + posY - totalHeight * 0.1;
-        let y = centerY - totalHeight / 2;
+        // --- Center vertically ---
+        const centerY = canvas.height / 2 + posY;
 
-        // --- Background with inset border ---
+        // ✅ Fine-tune offset for one-line names
+        // One-line names have less visual weight, so we lift slightly
+        const visualAdjustment = nameLineCount === 1 ? adjustedNameSize * 0.3 : 0;
+        let y = centerY - totalHeight / 2 + visualAdjustment;
+
+        // --- Background box with inset border ---
         if (textBoxEnabled.checked) {
             const boxPadding = 30;
             const boxWidth = canvas.width * 0.9;
@@ -1081,7 +1089,7 @@ function updateCanvas() {
         // --- Name text ---
         if (name) {
             ctx.font = `${adjustedNameSize}px ${nameFontFamily}`;
-            nameLines.forEach(line => {
+            nameLines.forEach((line) => {
                 y += adjustedNameSize;
                 ctx.fillText(line, canvas.width / 2 + posX, y);
             });
@@ -1110,6 +1118,7 @@ updateCanvas();
     </script>
 </body>
 </html>
+
 
 
 
