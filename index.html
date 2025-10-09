@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greeting Card Creator</title>
+    <title>Zhandee's Topper Creator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
@@ -346,7 +346,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎨 Greeting Card Creator</h1>
+        <h1>Zhandee's Topper Creator</h1>
         
         <div class="preview-section">
             <h2>Preview</h2>
@@ -1006,25 +1006,24 @@ function updateCanvas() {
         const greetingFontFamily = "Bebas Neue";
         const addFontFamily = "Quicksand";
 
-        // --- Calculate name fit and wrapping ---
+        // --- Fit + wrap name ---
         const maxNameWidth = canvas.width * 0.7;
         const maxNameHeight = canvas.height * 0.4;
         const { fontSize: adjustedNameSize, lines: nameLines } = calculateFittingFont(
             ctx, name, maxNameWidth, maxNameHeight, 80 * textScale, nameFontFamily
         );
 
-        // Determine actual number of lines
         const nameLineCount = nameLines.length;
-        const nameLineHeight = adjustedNameSize * (nameLineCount > 1 ? 1.05 : 1.0);
+        const nameLineHeight = adjustedNameSize * (nameLineCount > 1 ? 1.1 : 1.0);
 
-        // Determine total height of all text elements
+        // --- Height calculations ---
         const greetingHeight = greeting ? baseFontSize : 0;
         const nameHeight = nameLineCount * nameLineHeight;
         const addHeight = additional ? baseFontSize * 0.8 : 0;
 
-        // Adjust vertical gaps depending on single or multi-line
-        const gapGreetingToName = greeting ? lineSpacing * 0.4 : 0;
-        const gapNameToAdd = nameLineCount > 1 ? lineSpacing * 0.3 : lineSpacing * 0.1;
+        // Loosen spacing slightly
+        const gapGreetingToName = greeting ? lineSpacing * 0.8 : 0;
+        const gapNameToAdd = nameLineCount > 1 ? lineSpacing * 0.6 : lineSpacing * 0.4;
 
         const totalHeight =
             greetingHeight +
@@ -1033,15 +1032,15 @@ function updateCanvas() {
             gapNameToAdd +
             addHeight;
 
-        // Perfectly center vertically
-        const centerY = canvas.height / 2 + posY;
+        // Lift up slightly (visually centered)
+        const centerY = canvas.height / 2 + posY - totalHeight * 0.1;
         let y = centerY - totalHeight / 2;
 
-        // --- Draw solid white background with inset border ---
+        // --- Background with inset border ---
         if (textBoxEnabled.checked) {
             const boxPadding = 30;
             const boxWidth = canvas.width * 0.9;
-            const boxHeight = totalHeight + boxPadding * 1.2;
+            const boxHeight = totalHeight + boxPadding * 1.3;
             const boxX = (canvas.width - boxWidth) / 2;
             const boxY = centerY - boxHeight / 2;
 
@@ -1111,6 +1110,7 @@ updateCanvas();
     </script>
 </body>
 </html>
+
 
 
 
