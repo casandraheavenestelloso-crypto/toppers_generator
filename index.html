@@ -6,9 +6,14 @@
     <title>Zhandee's Topper Creator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        @font-face {
+            font-family: 'Gistesy';
+            src: url('https://fonts.cdnfonts.com/s/15595/Gistesy.woff') format('woff');
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -774,9 +779,20 @@
         let posY = 0;
         let savedCards = [];
 
-        let backgrounds = [];
+        let backgrounds = [
+            { id: 1, type: 'image', src: 'assets/bg1.png' },
+            { id: 2, type: 'image', src: 'assets/bg2.png' },
+            { id: 3, type: 'image', src: 'assets/bg3.png' },
+            { id: 4, type: 'image', src: 'assets/bg4.png' },
+            { id: 5, type: 'image', src: 'assets/bg5.png' },
+            { id: 6, type: 'image', src: 'assets/bg6.png' },
+            { id: 7, type: 'image', src: 'assets/bg7.png' },
+            { id: 8, type: 'image', src: 'assets/bg8.png' },
+            { id: 9, type: 'image', src: 'assets/bg9.png' },
+            { id: 10, type: 'image', src: 'assets/bg10.png' }
+        ];
 
-        let selectedBg = null;
+        let selectedBg = backgrounds[0];
 
         function updateProgress() {
             const progress = ((currentSlide - 1) / (totalSlides - 1)) * 100;
@@ -853,15 +869,11 @@
             document.getElementById('textBoxColors').style.display = 'none';
             
             // Reset background to first option
-            if (backgrounds.length > 0) {
-                selectedBg = backgrounds[0];
-                document.querySelectorAll('.bg-option').forEach((el, index) => {
-                    el.classList.remove('selected');
-                    if (index === 0) el.classList.add('selected');
-                });
-            } else {
-                selectedBg = null;
-            }
+            selectedBg = backgrounds[0];
+            document.querySelectorAll('.bg-option').forEach((el, index) => {
+                el.classList.remove('selected');
+                if (index === 0) el.classList.add('selected');
+            });
             
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -875,20 +887,12 @@
                 const file = files[i];
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    const newBg = {
+                    backgrounds.push({
                         id: backgrounds.length + 1,
                         type: 'image',
                         src: event.target.result
-                    };
-                    backgrounds.push(newBg);
-                    
-                    // Auto-select first uploaded background
-                    if (backgrounds.length === 1) {
-                        selectedBg = newBg;
-                    }
-                    
+                    });
                     initBackgrounds();
-                    updateCanvas();
                 };
                 reader.readAsDataURL(file);
             }
@@ -897,16 +901,10 @@
         function initBackgrounds() {
             const bgSelector = document.getElementById('bgSelector');
             bgSelector.innerHTML = '';
-            
-            if (backgrounds.length === 0) {
-                bgSelector.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 20px;">Please upload background images to get started!</p>';
-                return;
-            }
-            
             backgrounds.forEach(bg => {
                 const div = document.createElement('div');
                 div.className = 'bg-option';
-                if (selectedBg && bg.id === selectedBg.id) div.classList.add('selected');
+                if (bg.id === selectedBg.id) div.classList.add('selected');
                 
                 const img = document.createElement('img');
                 img.src = bg.src;
@@ -1027,17 +1025,6 @@
         }
 
         function updateCanvas() {
-            if (!selectedBg) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#f0f0f0';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#999';
-                ctx.font = '20px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('Upload a background image to start', canvas.width / 2, canvas.height / 2);
-                return;
-            }
-            
             const greeting = document.getElementById('greeting').value.trim();
             const name = document.getElementById('name').value.trim();
             const additional = document.getElementById('additional').value.trim();
@@ -1045,7 +1032,6 @@
             const textScale = parseFloat(document.getElementById('textScale').value);
 
             const img = new Image();
-            img.crossOrigin = 'anonymous'; // Enable CORS
             img.src = selectedBg.src;
 
             img.onload = function () {
@@ -1056,9 +1042,9 @@
                 ctx.textBaseline = "alphabetic";
 
                 const baseFontSize = 40 * textScale;
-                const nameFontFamily = "'Dancing Script', cursive";
-                const greetingFontFamily = "'Bebas Neue', Arial";
-                const addFontFamily = "'Quicksand', sans-serif";
+                const nameFontFamily = "Gistesy, cursive";
+                const greetingFontFamily = "Bebas Neue";
+                const addFontFamily = "Quicksand";
 
                 const maxNameWidth = canvas.width * 0.7;
                 const maxNameHeight = canvas.height * 0.4;
