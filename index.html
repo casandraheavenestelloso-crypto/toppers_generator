@@ -1036,11 +1036,8 @@
 
             img.onload = function () {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                // Calculate scale to cover canvas (clip, not compress)
-                const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-                const x = (canvas.width / 2) - (img.width / 2) * scale;
-                const y = (canvas.height / 2) - (img.height / 2) * scale;
-                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
                 ctx.textAlign = "center";
                 ctx.textBaseline = "alphabetic";
 
