@@ -1036,7 +1036,16 @@
 
             img.onload = function () {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                // Calculate scaling to cover the canvas while maintaining aspect ratio
+                const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                const scaledWidth = img.width * scale;
+                const scaledHeight = img.height * scale;
+
+                // Center the image
+                const bgX = (canvas.width - scaledWidth) / 2;
+                const bgY = (canvas.height - scaledHeight) / 2;
+
+                ctx.drawImage(img, bgX, bgY, scaledWidth, scaledHeight);
 
                 ctx.textAlign = "center";
                 ctx.textBaseline = "alphabetic";
