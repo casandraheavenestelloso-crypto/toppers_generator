@@ -6,14 +6,9 @@
     <title>Zhandee's Topper Creator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        @font-face {
-            font-family: 'Gistesy';
-            src: url('https://fonts.cdnfonts.com/s/15595/Gistesy.woff') format('woff');
-        }
-        
         * {
             margin: 0;
             padding: 0;
@@ -25,29 +20,156 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding-bottom: 60px;
         }
 
         .container {
             background: white;
             border-radius: 20px;
-            padding: 30px;
             max-width: 900px;
             width: 100%;
+            margin: 0 auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+        }
+
+        .sticky-header {
+            position: sticky;
+            top: 20px;
+            background: white;
+            z-index: 1000;
+            border-radius: 20px 20px 0 0;
+            padding: 30px 30px 0 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-size: 28px;
         }
 
-        .form-section {
-            margin-bottom: 30px;
+        .progress-container {
+            margin: 20px 0 20px;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+
+        .progress-line-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .step-indicator {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        .step-indicator.active .step-circle {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .step-indicator.completed .step-circle {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .step-label {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .step-indicator.active .step-label {
+            color: #667eea;
+        }
+
+        .preview-section {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        #canvas {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-area {
+            padding: 30px;
+            padding-top: 500px;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .form-group {
@@ -75,23 +197,6 @@
             border-color: #667eea;
         }
 
-        input[type="color"] {
-            width: 100%;
-            height: 50px;
-            padding: 5px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
         input[type="range"] {
             width: 100%;
             height: 8px;
@@ -103,7 +208,6 @@
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
             width: 20px;
             height: 20px;
             border-radius: 50%;
@@ -122,44 +226,8 @@
 
         input[type="checkbox"] {
             cursor: pointer;
-        }
-
-        .color-choice, .shadow-color-choice {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 2px solid transparent;
-        }
-
-        .color-choice:hover, .shadow-color-choice:hover {
-            transform: scale(1.1);
-        }
-
-        .color-choice.selected, .shadow-color-choice.selected {
-            box-shadow: 0 0 0 3px #667eea;
-            transform: scale(1.1);
-        }
-
-        .position-btn {
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .position-btn:hover {
-            background: #5568d3;
-        }
-
-        .position-btn:active {
-            transform: scale(0.98);
+            width: 20px;
+            height: 20px;
         }
 
         .background-selector {
@@ -186,7 +254,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
             border-radius: 8px;
         }
 
@@ -199,51 +266,74 @@
             transform: scale(1.05);
         }
 
-        .preview-section {
-            text-align: center;
-            margin-bottom: 20px;
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .preview-section h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        #canvas {
-            border: 2px solid #e0e0e0;
+        .color-choice, .shadow-color-choice, .box-border-choice {
+            width: 50px;
+            height: 50px;
             border-radius: 8px;
-            max-width: 100%;
-            height: auto;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
         }
 
-        .download-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .color-choice:hover, .shadow-color-choice:hover, .box-border-choice:hover {
+            transform: scale(1.1);
+        }
+
+        .color-choice.selected, .shadow-color-choice.selected, .box-border-choice.selected {
+            box-shadow: 0 0 0 3px #667eea;
+            transform: scale(1.1);
+        }
+
+        .position-btn {
+            padding: 12px;
+            background: #667eea;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: background 0.2s;
         }
 
-        .download-btn:hover {
+        .position-btn:hover {
+            background: #5568d3;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+        }
+
+        .btn-next, .btn-finish {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-next:hover, .btn-finish:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .download-btn:active {
-            transform: translateY(0);
         }
 
         .saved-cards {
@@ -270,12 +360,11 @@
             border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
 
         .saved-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .saved-card img {
@@ -296,13 +385,6 @@
             height: 30px;
             cursor: pointer;
             font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .delete-card:hover {
-            background: #cc0000;
         }
 
         .add-card-btn {
@@ -315,7 +397,7 @@
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
             margin-bottom: 10px;
         }
 
@@ -324,803 +406,863 @@
             box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
         }
 
-        .box-border-choice {
-            width: 50px;
-            height: 50px;
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
             border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 2px solid transparent;
+            transition: all 0.2s;
         }
 
-        .box-border-choice:hover {
-            transform: scale(1.1);
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .box-border-choice.selected {
-            box-shadow: 0 0 0 3px #667eea;
-            transform: scale(1.1);
+        .pdf-preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
         }
 
+        .pdf-preview-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pdf-preview-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .pdf-preview-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .pdf-page-preview {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .pdf-page-preview h3 {
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 16px;
+        }
+
+        .pdf-cards-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .pdf-cards-container img {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .pdf-preview-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        .modal-btn-download {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Zhandee's Topper Creator</h1>
-        
-        <div class="preview-section">
-            <h2>Preview</h2>
-            <canvas id="canvas" width="726" height="263"></canvas>
-        </div>
-        
-        <div class="form-section">
-            <div class="form-group">
-                <label for="bgUpload">Upload Background Images:</label>
-                <input type="file" id="bgUpload" accept="image/*" multiple>
-            </div>
-
-            <div class="form-group">
-                <label>Choose Background:</label>
-                <div class="background-selector" id="bgSelector"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="greeting">Greeting Text:</label>
-                <input type="text" id="greeting" placeholder="e.g., Happy Birthday!" maxlength="50">
-            </div>
-
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" placeholder="e.g., John" maxlength="50">
-            </div>
-
-            <div class="form-group">
-                <label for="additional">Additional Text (Optional):</label>
-                <input type="text" id="additional" placeholder="e.g., Have a wonderful day!" maxlength="100">
-            </div>
-
-            <div class="form-group">
-                <label for="fontColor">Font Color:</label>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, 50px); gap: 10px;">
-                    <div class="color-choice" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;"></div>
-                    <div class="color-choice" data-color="#cccccc" style="background: #cccccc;"></div>
-                    <div class="color-choice" data-color="#999999" style="background: #999999;"></div>
-                    <div class="color-choice" data-color="#666666" style="background: #666666;"></div>
-                    <div class="color-choice" data-color="#333333" style="background: #333333;"></div>
-                    <div class="color-choice" data-color="#000000" style="background: #000000;"></div>
-                    <div class="color-choice" data-color="#ff0000" style="background: #ff0000;"></div>
-                    <div class="color-choice" data-color="#cc0000" style="background: #cc0000;"></div>
-                    <div class="color-choice" data-color="#990000" style="background: #990000;"></div>
-                    <div class="color-choice" data-color="#00ff00" style="background: #00ff00;"></div>
-                    <div class="color-choice" data-color="#00cc00" style="background: #00cc00;"></div>
-                    <div class="color-choice" data-color="#009900" style="background: #009900;"></div>
-                    <div class="color-choice" data-color="#0000ff" style="background: #0000ff;"></div>
-                    <div class="color-choice" data-color="#0000cc" style="background: #0000cc;"></div>
-                    <div class="color-choice" data-color="#000099" style="background: #000099;"></div>
-                    <div class="color-choice" data-color="#ffff00" style="background: #ffff00;"></div>
-                    <div class="color-choice" data-color="#cccc00" style="background: #cccc00;"></div>
-                    <div class="color-choice" data-color="#999900" style="background: #999900;"></div>
-                    <div class="color-choice" data-color="#ff00ff" style="background: #ff00ff;"></div>
-                    <div class="color-choice" data-color="#cc00cc" style="background: #cc00cc;"></div>
-                    <div class="color-choice" data-color="#990099" style="background: #990099;"></div>
-                    <div class="color-choice" data-color="#00ffff" style="background: #00ffff;"></div>
-                    <div class="color-choice" data-color="#00cccc" style="background: #00cccc;"></div>
-                    <div class="color-choice" data-color="#009999" style="background: #009999;"></div>
-                    <div class="color-choice" data-color="#ffa500" style="background: #ffa500;"></div>
-                    <div class="color-choice" data-color="#ff8c00" style="background: #ff8c00;"></div>
-                    <div class="color-choice" data-color="#ff6600" style="background: #ff6600;"></div>
-                    <div class="color-choice" data-color="#800080" style="background: #800080;"></div>
-                    <div class="color-choice" data-color="#660066" style="background: #660066;"></div>
-                    <div class="color-choice" data-color="#4d004d" style="background: #4d004d;"></div>
-                    <div class="color-choice" data-color="#ffc0cb" style="background: #ffc0cb;"></div>
-                    <div class="color-choice" data-color="#ff69b4" style="background: #ff69b4;"></div>
-                    <div class="color-choice" data-color="#ff1493" style="background: #ff1493;"></div>
-                    <div class="color-choice" data-color="#a52a2a" style="background: #a52a2a;"></div>
-                    <div class="color-choice" data-color="#8b4513" style="background: #8b4513;"></div>
-                    <div class="color-choice" data-color="#654321" style="background: #654321;"></div>
+        <!-- Sticky Header with Progress and Preview -->
+        <div class="sticky-header">
+            <h1>Zhandee's Topper Creator</h1>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-line">
+                        <div class="progress-line-fill" id="progressFill"></div>
+                    </div>
+                    <div class="step-indicator" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Background</div>
+                    </div>
+                    <div class="step-indicator" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Text</div>
+                    </div>
+                    <div class="step-indicator" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Style</div>
+                    </div>
+                    <div class="step-indicator" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Position</div>
+                    </div>
+                    <div class="step-indicator" data-step="5">
+                        <div class="step-circle">5</div>
+                        <div class="step-label">Save</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Text Shadow:</label>
-                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
-                        <input type="checkbox" id="shadowEnabled" checked style="width: 20px; height: 20px;">
-                        Enable Shadow
+            <div class="preview-section">
+                <h3>Live Preview</h3>
+                <canvas id="canvas" width="726" height="263"></canvas>
+            </div>
+        </div>
+
+        <!-- Content Area with Slides -->
+        <div class="content-area">
+            <!-- Slide 1: Background Selection -->
+            <div class="slide active" data-slide="1">
+                <h2 style="margin-bottom: 20px; color: #333;">Step 1: Choose Your Background</h2>
+                
+                <div class="form-group">
+                    <label for="bgUpload">Upload Custom Backgrounds (Optional):</label>
+                    <input type="file" id="bgUpload" accept="image/*" multiple>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Background:</label>
+                    <div class="background-selector" id="bgSelector"></div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-next" onclick="nextSlide()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Slide 2: Text Content -->
+            <div class="slide" data-slide="2">
+                <h2 style="margin-bottom: 20px; color: #333;">Step 2: Enter Your Text</h2>
+
+                <div class="form-group">
+                    <label for="greeting">Greeting Text:</label>
+                    <input type="text" id="greeting" placeholder="e.g., Happy Birthday!" maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" placeholder="e.g., John" maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="additional">Additional Text (Optional):</label>
+                    <input type="text" id="additional" placeholder="e.g., Have a wonderful day!" maxlength="100">
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-back" onclick="prevSlide()">← Back</button>
+                    <button class="btn btn-next" onclick="nextSlide()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Slide 3: Styling -->
+            <div class="slide" data-slide="3">
+                <h2 style="margin-bottom: 20px; color: #333;">Step 3: Style Your Text</h2>
+
+                <div class="form-group">
+                    <label>Font Color:</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, 50px); gap: 10px;">
+                        <div class="color-choice" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;"></div>
+                        <div class="color-choice" data-color="#000000" style="background: #000000;"></div>
+                        <div class="color-choice" data-color="#ff0000" style="background: #ff0000;"></div>
+                        <div class="color-choice" data-color="#00ff00" style="background: #00ff00;"></div>
+                        <div class="color-choice" data-color="#0000ff" style="background: #0000ff;"></div>
+                        <div class="color-choice" data-color="#ffff00" style="background: #ffff00;"></div>
+                        <div class="color-choice" data-color="#ff00ff" style="background: #ff00ff;"></div>
+                        <div class="color-choice" data-color="#00ffff" style="background: #00ffff;"></div>
+                        <div class="color-choice" data-color="#ffa500" style="background: #ffa500;"></div>
+                        <div class="color-choice" data-color="#800080" style="background: #800080;"></div>
+                        <div class="color-choice" data-color="#ffc0cb" style="background: #ffc0cb;"></div>
+                        <div class="color-choice" data-color="#a52a2a" style="background: #a52a2a;"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="shadowEnabled" checked>
+                        Enable Text Shadow
                     </label>
                 </div>
-                <div id="shadowColorSection">
-                    <label style="font-size: 14px; margin-bottom: 8px; display: block;">Shadow Color:</label>
+
+                <div class="form-group" id="shadowColorSection">
+                    <label>Shadow Color:</label>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, 50px); gap: 10px;">
                         <div class="shadow-color-choice" data-color="#000000" style="background: #000000;"></div>
                         <div class="shadow-color-choice" data-color="#333333" style="background: #333333;"></div>
                         <div class="shadow-color-choice" data-color="#666666" style="background: #666666;"></div>
                         <div class="shadow-color-choice" data-color="#999999" style="background: #999999;"></div>
-                        <div class="shadow-color-choice" data-color="#cccccc" style="background: #cccccc;"></div>
                         <div class="shadow-color-choice" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;"></div>
                         <div class="shadow-color-choice" data-color="#ff0000" style="background: #ff0000;"></div>
-                        <div class="shadow-color-choice" data-color="#cc0000" style="background: #cc0000;"></div>
                         <div class="shadow-color-choice" data-color="#0000ff" style="background: #0000ff;"></div>
-                        <div class="shadow-color-choice" data-color="#0000cc" style="background: #0000cc;"></div>
                         <div class="shadow-color-choice" data-color="#ffa500" style="background: #ffa500;"></div>
-                        <div class="shadow-color-choice" data-color="#ff8c00" style="background: #ff8c00;"></div>
-                        <div class="shadow-color-choice" data-color="#800080" style="background: #800080;"></div>
-                        <div class="shadow-color-choice" data-color="#660066" style="background: #660066;"></div>
-                        <div class="shadow-color-choice" data-color="#00ff00" style="background: #00ff00;"></div>
-                        <div class="shadow-color-choice" data-color="#00cc00" style="background: #00cc00;"></div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="textBoxEnabled">
-                    Enable Text Background Box
-                </label>
-            </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="textBoxEnabled">
+                        Enable Text Background Box
+                    </label>
+                </div>
 
-            <div class="form-group" id="textBoxColors" style="display: none;">
-                <label>Box Border Color:</label>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, 50px); gap: 10px;">
-                    <div class="box-border-choice" data-color="#f59b7a" style="background: #f59b7a;"></div>
-                    <div class="box-border-choice" data-color="#ff0000" style="background: #ff0000;"></div>
-                    <div class="box-border-choice" data-color="#cc0000" style="background: #cc0000;"></div>
-                    <div class="box-border-choice" data-color="#990000" style="background: #990000;"></div>
-                    <div class="box-border-choice" data-color="#00ff00" style="background: #00ff00;"></div>
-                    <div class="box-border-choice" data-color="#00cc00" style="background: #00cc00;"></div>
-                    <div class="box-border-choice" data-color="#009900" style="background: #009900;"></div>
-                    <div class="box-border-choice" data-color="#0000ff" style="background: #0000ff;"></div>
-                    <div class="box-border-choice" data-color="#0000cc" style="background: #0000cc;"></div>
-                    <div class="box-border-choice" data-color="#000099" style="background: #000099;"></div>
-                    <div class="box-border-choice" data-color="#ffff00" style="background: #ffff00;"></div>
-                    <div class="box-border-choice" data-color="#cccc00" style="background: #cccc00;"></div>
-                    <div class="box-border-choice" data-color="#999900" style="background: #999900;"></div>
-                    <div class="box-border-choice" data-color="#ff00ff" style="background: #ff00ff;"></div>
-                    <div class="box-border-choice" data-color="#cc00cc" style="background: #cc00cc;"></div>
-                    <div class="box-border-choice" data-color="#990099" style="background: #990099;"></div>
-                    <div class="box-border-choice" data-color="#00ffff" style="background: #00ffff;"></div>
-                    <div class="box-border-choice" data-color="#00cccc" style="background: #00cccc;"></div>
-                    <div class="box-border-choice" data-color="#009999" style="background: #009999;"></div>
-                    <div class="box-border-choice" data-color="#ffa500" style="background: #ffa500;"></div>
-                    <div class="box-border-choice" data-color="#ff8c00" style="background: #ff8c00;"></div>
-                    <div class="box-border-choice" data-color="#ff6600" style="background: #ff6600;"></div>
-                    <div class="box-border-choice" data-color="#800080" style="background: #800080;"></div>
-                    <div class="box-border-choice" data-color="#660066" style="background: #660066;"></div>
-                    <div class="box-border-choice" data-color="#4d004d" style="background: #4d004d;"></div>
-                    <div class="box-border-choice" data-color="#ffc0cb" style="background: #ffc0cb;"></div>
-                    <div class="box-border-choice" data-color="#ff69b4" style="background: #ff69b4;"></div>
-                    <div class="box-border-choice" data-color="#ff1493" style="background: #ff1493;"></div>
-                    <div class="box-border-choice" data-color="#a52a2a" style="background: #a52a2a;"></div>
-                    <div class="box-border-choice" data-color="#8b4513" style="background: #8b4513;"></div>
-                    <div class="box-border-choice" data-color="#654321" style="background: #654321;"></div>
-                    <div class="box-border-choice" data-color="#000000" style="background: #000000;"></div>
-                    <div class="box-border-choice" data-color="#333333" style="background: #333333;"></div>
-                    <div class="box-border-choice" data-color="#666666" style="background: #666666;"></div>
-                    <div class="box-border-choice" data-color="#999999" style="background: #999999;"></div>
-                    <div class="box-border-choice" data-color="#cccccc" style="background: #cccccc;"></div>
-                    <div class="box-border-choice" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;"></div>
+                <div class="form-group" id="textBoxColors" style="display: none;">
+                    <label>Box Border Color:</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, 50px); gap: 10px;">
+                        <div class="box-border-choice" data-color="#f59b7a" style="background: #f59b7a;"></div>
+                        <div class="box-border-choice" data-color="#ff0000" style="background: #ff0000;"></div>
+                        <div class="box-border-choice" data-color="#00ff00" style="background: #00ff00;"></div>
+                        <div class="box-border-choice" data-color="#0000ff" style="background: #0000ff;"></div>
+                        <div class="box-border-choice" data-color="#ffff00" style="background: #ffff00;"></div>
+                        <div class="box-border-choice" data-color="#ff00ff" style="background: #ff00ff;"></div>
+                        <div class="box-border-choice" data-color="#00ffff" style="background: #00ffff;"></div>
+                        <div class="box-border-choice" data-color="#ffa500" style="background: #ffa500;"></div>
+                        <div class="box-border-choice" data-color="#800080" style="background: #800080;"></div>
+                        <div class="box-border-choice" data-color="#000000" style="background: #000000;"></div>
+                        <div class="box-border-choice" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;"></div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-back" onclick="prevSlide()">← Back</button>
+                    <button class="btn btn-next" onclick="nextSlide()">Next →</button>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Text Position:</label>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    <button type="button" class="position-btn" onclick="moveText('left')">← Left</button>
-                    <button type="button" class="position-btn" onclick="moveText('right')">Right →</button>
-                    <button type="button" class="position-btn" onclick="moveText('up')">↑ Up</button>
-                    <button type="button" class="position-btn" onclick="moveText('down')">Down ↓</button>
+            <!-- Slide 4: Position & Size -->
+            <div class="slide" data-slide="4">
+                <h2 style="margin-bottom: 20px; color: #333;">Step 4: Adjust Position & Size</h2>
+
+                <div class="form-group">
+                    <label>Text Position:</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <button type="button" class="position-btn" onclick="moveText('left')">← Left</button>
+                        <button type="button" class="position-btn" onclick="moveText('right')">Right →</button>
+                        <button type="button" class="position-btn" onclick="moveText('up')">↑ Up</button>
+                        <button type="button" class="position-btn" onclick="moveText('down')">Down ↓</button>
+                    </div>
+                    <button type="button" class="position-btn" onclick="resetPosition()" style="margin-top: 10px; background: #666; width: 100%;">Reset Position</button>
                 </div>
-                <button type="button" class="position-btn" onclick="resetPosition()" style="margin-top: 10px; background: #666;">Reset Position</button>
+
+                <div class="form-group">
+                    <label for="textScale">Text Size:</label>
+                    <input type="range" id="textScale" min="0.5" max="2" step="0.1" value="1">
+                    <div style="text-align: center; margin-top: 5px; font-size: 14px; color: #666;">
+                        <span id="scaleValue">100%</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lineSpacing">Line Spacing:</label>
+                    <input type="range" id="lineSpacing" min="0" max="50" value="15">
+                    <div style="text-align: center; margin-top: 5px; font-size: 14px; color: #666;">
+                        <span id="spacingValue">15px</span>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-back" onclick="prevSlide()">← Back</button>
+                    <button class="btn btn-next" onclick="nextSlide()">Next →</button>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="textScale">Text Size:</label>
-                <input type="range" id="textScale" min="0.5" max="2" step="0.1" value="1" style="width: 100%;">
-                <div style="text-align: center; margin-top: 5px; font-size: 14px; color: #666;">
-                    <span id="scaleValue">100%</span>
-                </div>
-            </div>
+            <!-- Slide 5: Review & Save -->
+            <div class="slide" data-slide="5">
+                <h2 style="margin-bottom: 20px; color: #333;">Step 5: Review & Save</h2>
 
-            <div class="form-group">
-                <label for="lineSpacing">Line Spacing:</label>
-                <input type="range" id="lineSpacing" min="0" max="50" value="15" style="width: 100%;">
-                <div style="text-align: center; margin-top: 5px; font-size: 14px; color: #666;">
-                    <span id="spacingValue">15px</span>
+                <p style="margin-bottom: 20px; color: #666; text-align: center;">
+                    Review your design above and add it to your collection!
+                </p>
+
+                <button class="add-card-btn" onclick="addCard()">➕ Add Card to Collection</button>
+
+                <div class="saved-cards" id="savedCardsSection" style="display: none;">
+                    <h3>Your Cards (<span id="cardCount">0</span>)</h3>
+                    <div class="cards-grid" id="cardsGrid"></div>
+                    
+                    <button class="download-btn" onclick="showPDFPreview()" style="margin-top: 20px;">📄 Preview & Download PDF</button>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-back" onclick="prevSlide()">← Back</button>
+                    <button class="btn btn-finish" onclick="createAnother()">Create Another Card</button>
                 </div>
             </div>
         </div>
 
-        <button class="add-card-btn" onclick="addCard()">➕ Add Card to Collection</button>
-
-        <div class="saved-cards" id="savedCardsSection" style="display: none;">
-            <h3>Your Cards (<span id="cardCount">0</span>)</h3>
-            <div class="cards-grid" id="cardsGrid"></div>
+        <!-- PDF Preview Modal -->
+        <div class="pdf-preview-modal" id="pdfPreviewModal">
+            <div class="pdf-preview-content">
+                <h2>PDF Preview</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                    Your PDF will contain <strong><span id="totalCards">0</span> card(s)</strong> on <strong><span id="totalPages">0</span> page(s)</strong>
+                </p>
+                <div id="pdfPagesContainer"></div>
+                <div class="pdf-preview-buttons">
+                    <button class="modal-btn modal-btn-cancel" onclick="closePDFPreview()">Cancel</button>
+                    <button class="modal-btn modal-btn-download" onclick="confirmDownload()">📄 Download PDF</button>
+                </div>
+            </div>
         </div>
-
-        <button class="download-btn" onclick="downloadPDF()">📄 Download as PDF</button>
     </div>
 
-
     <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const greetingInput = document.getElementById('greeting');
-const nameInput = document.getElementById('name');
-const additionalInput = document.getElementById('additional');
-const lineSpacingInput = document.getElementById('lineSpacing');
-const textScaleInput = document.getElementById('textScale');
-const shadowEnabledInput = document.getElementById('shadowEnabled');
-const bgSelector = document.getElementById('bgSelector');
-const textBoxEnabled = document.getElementById('textBoxEnabled');
-
-let fontColor = '#ffffff';
-let shadowColor = '#000000';
-let boxBorderColor = '#f59b7a';
-let posX = 0;
-let posY = 0;
-let savedCards = [];
-
-textBoxEnabled.addEventListener('change', () => {
-    document.getElementById('textBoxColors').style.display = textBoxEnabled.checked ? 'block' : 'none';
-    updateCanvas();
-});
-
-document.querySelectorAll('.box-border-choice').forEach(choice => {
-    if (choice.dataset.color === boxBorderColor) {
-        choice.classList.add('selected');
-    }
-    choice.addEventListener('click', function() {
-        document.querySelectorAll('.box-border-choice').forEach(c => c.classList.remove('selected'));
-        this.classList.add('selected');
-        boxBorderColor = this.dataset.color;
-        updateCanvas();
-    });
-});
-
-textScaleInput.addEventListener('input', () => {
-    document.getElementById('scaleValue').textContent = Math.round(textScaleInput.value * 100) + '%';
-    updateCanvas();
-});
-
-lineSpacingInput.addEventListener('input', () => {
-    document.getElementById('spacingValue').textContent = lineSpacingInput.value + 'px';
-    updateCanvas();
-});
-
-shadowEnabledInput.addEventListener('change', updateCanvas);
-
-document.querySelectorAll('.color-choice').forEach(choice => {
-    if (choice.dataset.color === fontColor) {
-        choice.classList.add('selected');
-    }
-    choice.addEventListener('click', function() {
-        document.querySelectorAll('.color-choice').forEach(c => c.classList.remove('selected'));
-        this.classList.add('selected');
-        fontColor = this.dataset.color;
-        updateCanvas();
-    });
-});
-
-document.querySelectorAll('.shadow-color-choice').forEach(choice => {
-    if (choice.dataset.color === shadowColor) {
-        choice.classList.add('selected');
-    }
-    choice.addEventListener('click', function() {
-        document.querySelectorAll('.shadow-color-choice').forEach(c => c.classList.remove('selected'));
-        this.classList.add('selected');
-        shadowColor = this.dataset.color;
-        updateCanvas();
-    });
-});
-
-function moveText(direction) {
-    const step = 10;
-    if (direction === 'left') posX -= step;
-    if (direction === 'right') posX += step;
-    if (direction === 'up') posY -= step;
-    if (direction === 'down') posY += step;
-    updateCanvas();
-}
-
-function resetPosition() {
-    posX = 0;
-    posY = 0;
-    updateCanvas();
-}
-
-function addCard() {
-    const cardData = canvas.toDataURL('image/png');
-    savedCards.push(cardData);
-    updateCardsDisplay();
-}
-
-function updateCardsDisplay() {
-    const section = document.getElementById('savedCardsSection');
-    const grid = document.getElementById('cardsGrid');
-    const count = document.getElementById('cardCount');
-    
-    if (savedCards.length === 0) {
-        section.style.display = 'none';
-        return;
-    }
-    
-    section.style.display = 'block';
-    count.textContent = savedCards.length;
-    
-    grid.innerHTML = '';
-    savedCards.forEach((cardData, index) => {
-        const cardDiv = document.createElement('div');
-        cardDiv.className = 'saved-card';
+        let currentSlide = 1;
+        const totalSlides = 5;
         
-        const img = document.createElement('img');
-        img.src = cardData;
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-card';
-        deleteBtn.innerHTML = '×';
-        deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            savedCards.splice(index, 1);
-            updateCardsDisplay();
-        };
-        
-        cardDiv.appendChild(img);
-        cardDiv.appendChild(deleteBtn);
-        grid.appendChild(cardDiv);
-    });
-}
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
-function downloadPDF() {
-    if (savedCards.length === 0) {
-        alert('Please add at least one card to your collection first!');
-        return;
-    }
+        let fontColor = '#ffffff';
+        let shadowColor = '#000000';
+        let boxBorderColor = '#f59b7a';
+        let posX = 0;
+        let posY = 0;
+        let savedCards = [];
 
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-    });
+        let backgrounds = [
+            { id: 1, type: 'image', src: 'assets/bg1.png' },
+            { id: 2, type: 'image', src: 'assets/bg2.png' },
+            { id: 3, type: 'image', src: 'assets/bg3.png' },
+            { id: 4, type: 'image', src: 'assets/bg4.png' },
+            { id: 5, type: 'image', src: 'assets/bg5.png' },
+            { id: 6, type: 'image', src: 'assets/bg6.png' },
+            { id: 7, type: 'image', src: 'assets/bg7.png' },
+            { id: 8, type: 'image', src: 'assets/bg8.png' },
+            { id: 9, type: 'image', src: 'assets/bg9.png' },
+            { id: 10, type: 'image', src: 'assets/bg10.png' }
+        ];
 
-    const a4Width = 210;
-    const cardWidth = 192.024;
-    const cardHeight = 69.596;
-    const verticalSpacing = 0;
-    const cardsPerPage = 4;
+        let selectedBg = backgrounds[0];
 
-    savedCards.forEach((cardData, index) => {
-        if (index > 0 && index % cardsPerPage === 0) {
-            pdf.addPage();
-        }
-
-        const positionOnPage = index % cardsPerPage;
-        const x = (a4Width - cardWidth) / 2;
-        const y = 10 + (positionOnPage * (cardHeight + verticalSpacing));
-
-        pdf.addImage(cardData, 'PNG', x, y, cardWidth, cardHeight);
-    });
-
-    pdf.save('greeting-cards.pdf');
-}
-
-
-let backgrounds = [
-    { id: 1, type: 'image', src: 'assets/bg1.png' },
-    { id: 2, type: 'image', src: 'assets/bg2.png' },
-    { id: 3, type: 'image', src: 'assets/bg3.png' },
-    { id: 4, type: 'image', src: 'assets/bg4.png' },
-    { id: 5, type: 'image', src: 'assets/bg5.png' },
-    { id: 6, type: 'image', src: 'assets/bg6.png' },
-    { id: 7, type: 'image', src: 'assets/bg7.png' },
-    { id: 8, type: 'image', src: 'assets/bg8.png' },
-    { id: 9, type: 'image', src: 'assets/bg9.png' },
-    { id: 10, type: 'image', src: 'assets/bg10.png' }
-];
-
-let selectedBg = backgrounds[0];
-
-document.getElementById('bgUpload').addEventListener('change', function(e) {
-    const files = e.target.files;
-    
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
-        
-        reader.onload = function(event) {
-            const newBg = {
-                id: backgrounds.length + 1,
-                type: 'image',
-                src: event.target.result
-            };
-            backgrounds.push(newBg);
+        function updateProgress() {
+            const progress = ((currentSlide - 1) / (totalSlides - 1)) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
             
-            bgSelector.innerHTML = '';
-            initBackgrounds();
-        };
-        
-        reader.readAsDataURL(file);
-    }
-});
-
-function initBackgrounds() {
-    backgrounds.forEach(bg => {
-        const div = document.createElement('div');
-        div.className = 'bg-option';
-        if (bg.id === selectedBg.id) div.classList.add('selected');
-        
-        const img = document.createElement('img');
-        img.src = bg.src;
-        div.appendChild(img);
-        
-        div.onclick = () => selectBackground(bg, div);
-        bgSelector.appendChild(div);
-    });
-}
-
-function selectBackground(bg, element) {
-    selectedBg = bg;
-    document.querySelectorAll('.bg-option').forEach(el => el.classList.remove('selected'));
-    element.classList.add('selected');
-    updateCanvas();
-}
-
-function calculateFontSize(text, maxWidth, maxHeight, baseFontSize, fontFamily) {
-    let fontSize = baseFontSize;
-    ctx.font = `bold ${fontSize}px ${fontFamily}`;
-    
-    while (ctx.measureText(text).width > maxWidth && fontSize > 10) {
-        fontSize -= 2;
-        ctx.font = `bold ${fontSize}px ${fontFamily}`;
-    }
-    
-    return fontSize;
-}
-
-function drawText() {
-    const greeting = greetingInput.value.trim();
-    const name = nameInput.value.trim();
-    const additional = additionalInput.value.trim();
-    
-    if (!greeting && !name && !additional) return;
-    
-    const scale = parseFloat(textScaleInput.value);
-    
-    const baseGreetingSize = 40 * scale;
-    const baseNameSize = 80 * scale;
-    const baseAdditionalSize = 24 * scale;
-    
-    // Split name into lines by words, keeping each line under 12 characters
-    const nameLines = [];
-    if (name) {
-        const words = name.split(' ');
-        let currentLine = '';
-        
-        for (let word of words) {
-            const testLine = currentLine ? currentLine + ' ' + word : word;
-            if (testLine.length <= 12) {
-                currentLine = testLine;
-            } else {
-                if (currentLine) {
-                    nameLines.push(currentLine);
+            document.querySelectorAll('.step-indicator').forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum === currentSlide) {
+                    step.classList.add('active');
+                } else if (stepNum < currentSlide) {
+                    step.classList.add('completed');
                 }
-                currentLine = word;
-            }
-        }
-        if (currentLine) {
-            nameLines.push(currentLine);
-        }
-    }
-    
-    const greetingSize = greeting ? calculateFontSize(greeting, 650, 60, baseGreetingSize, "'Bebas Neue', Arial") : 0;
-    
-    // Calculate name size based on longest line
-    let nameSize = 0;
-    if (nameLines.length > 0) {
-        ctx.font = `bold ${baseNameSize}px 'Dancing Script', cursive`;
-        let maxWidth = 0;
-        for (let line of nameLines) {
-            maxWidth = Math.max(maxWidth, ctx.measureText(line).width);
-        }
-        // Adjust size if any line is too wide
-        nameSize = baseNameSize;
-        while (maxWidth > 650 && nameSize > 20) {
-            nameSize -= 2;
-            ctx.font = `bold ${nameSize}px 'Dancing Script', cursive`;
-            maxWidth = 0;
-            for (let line of nameLines) {
-                maxWidth = Math.max(maxWidth, ctx.measureText(line).width);
-            }
-        }
-    }
-    
-    const additionalSize = additional ? calculateFontSize(additional, 650, 40, baseAdditionalSize, "'Quicksand', sans-serif") : 0;
-    
-    const lineHeights = [];
-    if (greeting) lineHeights.push(greetingSize);
-    if (nameLines.length > 0) {
-        // Add height for each name line
-        for (let i = 0; i < nameLines.length; i++) {
-            lineHeights.push(nameSize);
-        }
-    }
-    if (additional) lineHeights.push(additionalSize);
-    
-    const spacing = parseInt(lineSpacingInput.value);
-    const totalHeight = lineHeights.reduce((sum, h) => sum + h, 0) + (lineHeights.length - 1) * spacing;
-    
-    if (textBoxEnabled.checked) {
-        const paddingX = 40;
-        const paddingY = 30;
-        
-        let maxTextWidth = 0;
-        
-        if (greeting) {
-            ctx.font = `bold ${greetingSize}px 'Bebas Neue', Arial`;
-            maxTextWidth = Math.max(maxTextWidth, ctx.measureText(greeting).width);
-        }
-        if (nameLines.length > 0) {
-            ctx.font = `bold ${nameSize}px 'Dancing Script', cursive`;
-            for (let line of nameLines) {
-                maxTextWidth = Math.max(maxTextWidth, ctx.measureText(line).width);
-            }
-        }
-        if (additional) {
-            ctx.font = `${additionalSize}px 'Quicksand', sans-serif`;
-            maxTextWidth = Math.max(maxTextWidth, ctx.measureText(additional).width);
-        }
-        
-        const minBoxWidth = 586;
-        const boxWidth = Math.max(maxTextWidth + paddingX * 2, minBoxWidth);
-        const boxHeight = totalHeight + paddingY * 2;
-
-        const boxX = (canvas.width - boxWidth) / 2 + posX;
-        const boxY = (canvas.height - boxHeight) / 2 + posY;
-
-        const borderInset = 15;
-
-        const savedShadowColor = ctx.shadowColor;
-        const savedShadowBlur = ctx.shadowBlur;
-        const savedShadowOffsetX = ctx.shadowOffsetX;
-        const savedShadowOffsetY = ctx.shadowOffsetY;
-
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = boxBorderColor;
-        ctx.strokeRect(
-            boxX + borderInset, 
-            boxY + borderInset, 
-            boxWidth - (borderInset * 2), 
-            boxHeight - (borderInset * 2)
-        );
-
-        ctx.shadowColor = savedShadowColor;
-        ctx.shadowBlur = savedShadowBlur;
-        ctx.shadowOffsetX = savedShadowOffsetX;
-        ctx.shadowOffsetY = savedShadowOffsetY;
-    }
-    
-    let currentY = (canvas.height - totalHeight) / 2 + posY;
-    const centerX = canvas.width / 2 + posX;
-    
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    
-    if (shadowEnabledInput.checked) {
-        const r = parseInt(shadowColor.slice(1, 3), 16);
-        const g = parseInt(shadowColor.slice(3, 5), 16);
-        const b = parseInt(shadowColor.slice(5, 7), 16);
-        ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.5)`;
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
-    } else {
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-    }
-    
-    ctx.fillStyle = fontColor;
-    
-    if (greeting) {
-        ctx.font = `bold ${greetingSize}px 'Bebas Neue', Arial`;
-        ctx.fillText(greeting, centerX, currentY);
-        currentY += greetingSize + spacing;
-    }
-    
-    if (nameLines.length > 0) {
-        ctx.font = `bold ${nameSize}px 'Dancing Script', cursive`;
-        for (let line of nameLines) {
-            ctx.fillText(line, centerX, currentY);
-            currentY += nameSize + spacing;
-        }
-    }
-    
-    if (additional) {
-        ctx.font = `${additionalSize}px 'Quicksand', sans-serif`;
-        ctx.fillText(additional, centerX, currentY);
-    }
-}
-
-function wrapText(ctx, text, maxWidth, fontSize, fontFamily) {
-    ctx.font = `${fontSize}px ${fontFamily}`;
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
-
-    for (let i = 1; i < words.length; i++) {
-        const testLine = currentLine + ' ' + words[i];
-        const testWidth = ctx.measureText(testLine).width;
-        if (testWidth < maxWidth) {
-            currentLine = testLine;
-        } else {
-            lines.push(currentLine);
-            currentLine = words[i];
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
-
-function calculateFittingFont(ctx, text, maxWidth, maxHeight, baseFontSize, fontFamily) {
-    let fontSize = baseFontSize;
-    let lines = wrapText(ctx, text, maxWidth, fontSize, fontFamily);
-
-    // Reduce font size until both width and height fit
-    while ((lines.length * fontSize * 1.2) > maxHeight || lines.some(line => ctx.measureText(line).width > maxWidth)) {
-        fontSize -= 1;
-        if (fontSize <= 10) break;
-        lines = wrapText(ctx, text, maxWidth, fontSize, fontFamily);
-    }
-
-    return { fontSize, lines };
-}
-
-function updateCanvas() {
-    const greeting = greetingInput.value.trim();
-    const name = nameInput.value.trim();
-    const additional = additionalInput.value.trim();
-    const lineSpacing = parseInt(lineSpacingInput.value);
-    const textScale = parseFloat(textScaleInput.value);
-
-    const img = new Image();
-    img.src = selectedBg.src;
-
-    img.onload = async function () {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        ctx.textAlign = "center";
-        ctx.textBaseline = "alphabetic";
-
-        const baseFontSize = 40 * textScale;
-        const nameFontFamily = "Gistesy, cursive";
-        const greetingFontFamily = "Bebas Neue";
-        const addFontFamily = "Quicksand";
-
-        // --- Fit + wrap name ---
-        const maxNameWidth = canvas.width * 0.7;
-        const maxNameHeight = canvas.height * 0.4;
-        const { fontSize: adjustedNameSize, lines: nameLines } = calculateFittingFont(
-            ctx,
-            name,
-            maxNameWidth,
-            maxNameHeight,
-            80 * textScale,
-            nameFontFamily
-        );
-
-        const nameLineCount = nameLines.length;
-        const nameLineHeight = adjustedNameSize * (nameLineCount > 1 ? 1.1 : 1.0);
-
-        // --- Height calculations ---
-        const greetingHeight = greeting ? baseFontSize : 0;
-        const nameHeight = nameLineCount * nameLineHeight;
-        const addHeight = additional ? baseFontSize * 0.8 : 0;
-
-        const gapGreetingToName = greeting ? lineSpacing * 0.8 : 0;
-        const gapNameToAdd = nameLineCount > 1 ? lineSpacing * 0.7 : lineSpacing * 0.3;
-
-        const totalHeight =
-            greetingHeight +
-            gapGreetingToName +
-            nameHeight +
-            gapNameToAdd +
-            addHeight;
-
-        // --- Center vertically ---
-        const centerY = canvas.height / 2 + posY;
-
-        // ✅ Fine-tune offset for one-line names
-        // One-line names have less visual weight, so we lift slightly
-        const visualAdjustment = nameLineCount === 1 ? adjustedNameSize * 0.4 : 0;
-        let y = centerY - totalHeight / 2 + visualAdjustment;
-
-        // --- Background box with inset border ---
-        if (textBoxEnabled.checked) {
-            const boxPadding = 30;
-            const boxWidth = canvas.width * 0.9;
-            const boxHeight = totalHeight + boxPadding * 1.3;
-            const boxX = (canvas.width - boxWidth) / 2;
-            const boxY = centerY - boxHeight / 2;
-
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-
-            const inset = 10;
-            ctx.strokeStyle = boxBorderColor;
-            ctx.lineWidth = 4;
-            ctx.strokeRect(
-                boxX + inset,
-                boxY + inset,
-                boxWidth - inset * 2,
-                boxHeight - inset * 2
-            );
-        }
-
-        // Shadow
-        if (shadowEnabledInput.checked) {
-            ctx.shadowColor = shadowColor;
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetX = 3;
-            ctx.shadowOffsetY = 3;
-        } else {
-            ctx.shadowColor = "transparent";
-        }
-
-        ctx.fillStyle = fontColor;
-
-        // --- Greeting text ---
-        if (greeting) {
-            ctx.font = `${baseFontSize}px ${greetingFontFamily}`;
-            y += baseFontSize;
-            ctx.fillText(greeting, canvas.width / 2 + posX, y);
-            y += gapGreetingToName;
-        }
-
-        // --- Name text ---
-        if (name) {
-            ctx.font = `${adjustedNameSize}px ${nameFontFamily}`;
-            nameLines.forEach((line) => {
-                y += adjustedNameSize;
-                ctx.fillText(line, canvas.width / 2 + posX, y);
             });
-            y += gapNameToAdd;
         }
 
-        // --- Additional text ---
-        if (additional) {
-            ctx.font = `${baseFontSize * 0.8}px ${addFontFamily}`;
-            y += baseFontSize * 0.8;
-            ctx.fillText(additional, canvas.width / 2 + posX, y);
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                document.querySelector(`.slide[data-slide="${currentSlide}"]`).classList.remove('active');
+                currentSlide++;
+                document.querySelector(`.slide[data-slide="${currentSlide}"]`).classList.add('active');
+                updateProgress();
+            }
         }
 
-        ctx.shadowColor = "transparent";
-    };
-}
+        function prevSlide() {
+            if (currentSlide > 1) {
+                document.querySelector(`.slide[data-slide="${currentSlide}"]`).classList.remove('active');
+                currentSlide--;
+                document.querySelector(`.slide[data-slide="${currentSlide}"]`).classList.add('active');
+                updateProgress();
+            }
+        }
 
+        function createAnother() {
+            // Reset to first slide
+            currentSlide = 1;
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.querySelector('.slide[data-slide="1"]').classList.add('active');
+            updateProgress();
+            
+            // Clear all inputs
+            document.getElementById('greeting').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('additional').value = '';
+            
+            // Reset position and scale
+            posX = 0;
+            posY = 0;
+            document.getElementById('textScale').value = 1;
+            document.getElementById('scaleValue').textContent = '100%';
+            document.getElementById('lineSpacing').value = 15;
+            document.getElementById('spacingValue').textContent = '15px';
+            
+            // Reset colors to defaults
+            fontColor = '#ffffff';
+            shadowColor = '#000000';
+            boxBorderColor = '#f59b7a';
+            
+            // Reset color selections
+            document.querySelectorAll('.color-choice').forEach(c => c.classList.remove('selected'));
+            document.querySelector('.color-choice[data-color="#ffffff"]').classList.add('selected');
+            
+            document.querySelectorAll('.shadow-color-choice').forEach(c => c.classList.remove('selected'));
+            document.querySelector('.shadow-color-choice[data-color="#000000"]').classList.add('selected');
+            
+            document.querySelectorAll('.box-border-choice').forEach(c => c.classList.remove('selected'));
+            document.querySelector('.box-border-choice[data-color="#f59b7a"]').classList.add('selected');
+            
+            // Reset checkboxes
+            document.getElementById('shadowEnabled').checked = true;
+            document.getElementById('textBoxEnabled').checked = false;
+            document.getElementById('textBoxColors').style.display = 'none';
+            
+            // Reset background to first option
+            selectedBg = backgrounds[0];
+            document.querySelectorAll('.bg-option').forEach((el, index) => {
+                el.classList.remove('selected');
+                if (index === 0) el.classList.add('selected');
+            });
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateCanvas();
+        }
 
-[greetingInput, nameInput, additionalInput].forEach(input =>
-    input.addEventListener('input', updateCanvas)
-);
+        // Background upload
+        document.getElementById('bgUpload').addEventListener('change', function(e) {
+            const files = e.target.files;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    backgrounds.push({
+                        id: backgrounds.length + 1,
+                        type: 'image',
+                        src: event.target.result
+                    });
+                    initBackgrounds();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-initBackgrounds();
-updateCanvas();
+        function initBackgrounds() {
+            const bgSelector = document.getElementById('bgSelector');
+            bgSelector.innerHTML = '';
+            backgrounds.forEach(bg => {
+                const div = document.createElement('div');
+                div.className = 'bg-option';
+                if (bg.id === selectedBg.id) div.classList.add('selected');
+                
+                const img = document.createElement('img');
+                img.src = bg.src;
+                div.appendChild(img);
+                
+                div.onclick = () => {
+                    selectedBg = bg;
+                    document.querySelectorAll('.bg-option').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+                    updateCanvas();
+                };
+                bgSelector.appendChild(div);
+            });
+        }
 
+        // Color selection
+        document.querySelectorAll('.color-choice').forEach(choice => {
+            if (choice.dataset.color === fontColor) choice.classList.add('selected');
+            choice.addEventListener('click', function() {
+                document.querySelectorAll('.color-choice').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                fontColor = this.dataset.color;
+                updateCanvas();
+            });
+        });
+
+        document.querySelectorAll('.shadow-color-choice').forEach(choice => {
+            if (choice.dataset.color === shadowColor) choice.classList.add('selected');
+            choice.addEventListener('click', function() {
+                document.querySelectorAll('.shadow-color-choice').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                shadowColor = this.dataset.color;
+                updateCanvas();
+            });
+        });
+
+        document.querySelectorAll('.box-border-choice').forEach(choice => {
+            if (choice.dataset.color === boxBorderColor) choice.classList.add('selected');
+            choice.addEventListener('click', function() {
+                document.querySelectorAll('.box-border-choice').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                boxBorderColor = this.dataset.color;
+                updateCanvas();
+            });
+        });
+
+        // Text box toggle
+        document.getElementById('textBoxEnabled').addEventListener('change', function() {
+            document.getElementById('textBoxColors').style.display = this.checked ? 'block' : 'none';
+            updateCanvas();
+        });
+
+        // Shadow toggle
+        document.getElementById('shadowEnabled').addEventListener('change', updateCanvas);
+
+        // Text inputs
+        document.getElementById('greeting').addEventListener('input', updateCanvas);
+        document.getElementById('name').addEventListener('input', updateCanvas);
+        document.getElementById('additional').addEventListener('input', updateCanvas);
+
+        // Sliders
+        document.getElementById('textScale').addEventListener('input', function() {
+            document.getElementById('scaleValue').textContent = Math.round(this.value * 100) + '%';
+            updateCanvas();
+        });
+
+        document.getElementById('lineSpacing').addEventListener('input', function() {
+            document.getElementById('spacingValue').textContent = this.value + 'px';
+            updateCanvas();
+        });
+
+        function moveText(direction) {
+            const step = 10;
+            if (direction === 'left') posX -= step;
+            if (direction === 'right') posX += step;
+            if (direction === 'up') posY -= step;
+            if (direction === 'down') posY += step;
+            updateCanvas();
+        }
+
+        function resetPosition() {
+            posX = 0;
+            posY = 0;
+            updateCanvas();
+        }
+
+        function wrapText(ctx, text, maxWidth, fontSize, fontFamily) {
+            ctx.font = `${fontSize}px ${fontFamily}`;
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                const testLine = currentLine + ' ' + words[i];
+                const testWidth = ctx.measureText(testLine).width;
+                if (testWidth < maxWidth) {
+                    currentLine = testLine;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        function calculateFittingFont(ctx, text, maxWidth, maxHeight, baseFontSize, fontFamily) {
+            let fontSize = baseFontSize;
+            let lines = wrapText(ctx, text, maxWidth, fontSize, fontFamily);
+
+            while ((lines.length * fontSize * 1.2) > maxHeight || lines.some(line => ctx.measureText(line).width > maxWidth)) {
+                fontSize -= 1;
+                if (fontSize <= 10) break;
+                lines = wrapText(ctx, text, maxWidth, fontSize, fontFamily);
+            }
+
+            return { fontSize, lines };
+        }
+
+        function updateCanvas() {
+            const greeting = document.getElementById('greeting').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const additional = document.getElementById('additional').value.trim();
+            const lineSpacing = parseInt(document.getElementById('lineSpacing').value);
+            const textScale = parseFloat(document.getElementById('textScale').value);
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous'; // Enable CORS
+            img.src = selectedBg.src;
+
+            img.onload = function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                ctx.textAlign = "center";
+                ctx.textBaseline = "alphabetic";
+
+                const baseFontSize = 40 * textScale;
+                const nameFontFamily = "'Dancing Script', cursive";
+                const greetingFontFamily = "'Bebas Neue', Arial";
+                const addFontFamily = "'Quicksand', sans-serif";
+
+                const maxNameWidth = canvas.width * 0.7;
+                const maxNameHeight = canvas.height * 0.4;
+                const { fontSize: adjustedNameSize, lines: nameLines } = calculateFittingFont(
+                    ctx,
+                    name,
+                    maxNameWidth,
+                    maxNameHeight,
+                    80 * textScale,
+                    nameFontFamily
+                );
+
+                const nameLineCount = nameLines.length;
+                const nameLineHeight = adjustedNameSize * (nameLineCount > 1 ? 1.1 : 1.0);
+
+                const greetingHeight = greeting ? baseFontSize : 0;
+                const nameHeight = nameLineCount * nameLineHeight;
+                const addHeight = additional ? baseFontSize * 0.8 : 0;
+
+                const gapGreetingToName = greeting ? lineSpacing * 0.8 : 0;
+                const gapNameToAdd = additional ? (nameLineCount > 1 ? lineSpacing * 0.7 : lineSpacing * 0.3) : 0;
+
+                const totalHeight =
+                    greetingHeight +
+                    gapGreetingToName +
+                    nameHeight +
+                    gapNameToAdd +
+                    addHeight;
+
+                const centerY = canvas.height / 2 + posY;
+                // Adjust for better visual centering based on number of lines
+                // Single-line names need more lift, multi-line names are naturally balanced
+                const visualCenterAdjustment = nameLineCount === 1 ? totalHeight * 0.07 : totalHeight * 0.04;
+                let y = centerY - totalHeight / 2 - visualCenterAdjustment;
+
+                if (document.getElementById('textBoxEnabled').checked) {
+                    const boxPadding = 30;
+                    const boxWidth = canvas.width * 0.9;
+                    const boxHeight = totalHeight + boxPadding * 1.3;
+                    const boxX = (canvas.width - boxWidth) / 2;
+                    const boxY = centerY - boxHeight / 2;
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+                    const inset = 10;
+                    ctx.strokeStyle = boxBorderColor;
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(
+                        boxX + inset,
+                        boxY + inset,
+                        boxWidth - inset * 2,
+                        boxHeight - inset * 2
+                    );
+                }
+
+                if (document.getElementById('shadowEnabled').checked) {
+                    ctx.shadowColor = shadowColor;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                } else {
+                    ctx.shadowColor = "transparent";
+                }
+
+                ctx.fillStyle = fontColor;
+
+                if (greeting) {
+                    ctx.font = `${baseFontSize}px ${greetingFontFamily}`;
+                    y += baseFontSize;
+                    ctx.fillText(greeting, canvas.width / 2 + posX, y);
+                    y += gapGreetingToName;
+                }
+
+                if (name) {
+                    ctx.font = `${adjustedNameSize}px ${nameFontFamily}`;
+                    nameLines.forEach((line) => {
+                        y += adjustedNameSize;
+                        ctx.fillText(line, canvas.width / 2 + posX, y);
+                    });
+                    y += gapNameToAdd;
+                }
+
+                if (additional) {
+                    ctx.font = `${baseFontSize * 0.8}px ${addFontFamily}`;
+                    y += baseFontSize * 0.8;
+                    ctx.fillText(additional, canvas.width / 2 + posX, y);
+                }
+
+                ctx.shadowColor = "transparent";
+            };
+        }
+
+        function addCard() {
+            const cardData = canvas.toDataURL('image/png');
+            savedCards.push(cardData);
+            updateCardsDisplay();
+        }
+
+        function updateCardsDisplay() {
+            const section = document.getElementById('savedCardsSection');
+            const grid = document.getElementById('cardsGrid');
+            const count = document.getElementById('cardCount');
+            
+            if (savedCards.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            count.textContent = savedCards.length;
+            
+            grid.innerHTML = '';
+            savedCards.forEach((cardData, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'saved-card';
+                
+                const img = document.createElement('img');
+                img.src = cardData;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-card';
+                deleteBtn.innerHTML = '×';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    savedCards.splice(index, 1);
+                    updateCardsDisplay();
+                };
+                
+                cardDiv.appendChild(img);
+                cardDiv.appendChild(deleteBtn);
+                grid.appendChild(cardDiv);
+            });
+        }
+
+        function downloadPDF() {
+            if (savedCards.length === 0) {
+                alert('Please add at least one card to your collection first!');
+                return;
+            }
+
+            // Directly show PDF preview - no automatic download
+            showPDFPreview();
+        }
+
+        function showPDFPreview() {
+            const modal = document.getElementById('pdfPreviewModal');
+            const container = document.getElementById('pdfPagesContainer');
+            const cardsPerPage = 4;
+            const totalPages = Math.ceil(savedCards.length / cardsPerPage);
+            
+            document.getElementById('totalCards').textContent = savedCards.length;
+            document.getElementById('totalPages').textContent = totalPages;
+            
+            container.innerHTML = '';
+            
+            for (let page = 0; page < totalPages; page++) {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'pdf-page-preview';
+                
+                const pageTitle = document.createElement('h3');
+                pageTitle.textContent = `Page ${page + 1} of ${totalPages}`;
+                pageDiv.appendChild(pageTitle);
+                
+                const cardsContainer = document.createElement('div');
+                cardsContainer.className = 'pdf-cards-container';
+                
+                const startIdx = page * cardsPerPage;
+                const endIdx = Math.min(startIdx + cardsPerPage, savedCards.length);
+                
+                for (let i = startIdx; i < endIdx; i++) {
+                    const img = document.createElement('img');
+                    img.src = savedCards[i];
+                    cardsContainer.appendChild(img);
+                }
+                
+                pageDiv.appendChild(cardsContainer);
+                container.appendChild(pageDiv);
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closePDFPreview() {
+            document.getElementById('pdfPreviewModal').classList.remove('active');
+        }
+
+        function confirmDownload() {
+            closePDFPreview();
+            
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const a4Width = 210;
+            const cardWidth = 192.024;
+            const cardHeight = 69.596;
+            const verticalSpacing = 0;
+            const cardsPerPage = 4;
+
+            savedCards.forEach((cardData, index) => {
+                if (index > 0 && index % cardsPerPage === 0) {
+                    pdf.addPage();
+                }
+
+                const positionOnPage = index % cardsPerPage;
+                const x = (a4Width - cardWidth) / 2;
+                const y = 10 + (positionOnPage * (cardHeight + verticalSpacing));
+
+                pdf.addImage(cardData, 'PNG', x, y, cardWidth, cardHeight);
+            });
+
+            pdf.save('greeting-cards.pdf');
+        }
+
+        // Initialize
+        initBackgrounds();
+        updateProgress();
+        updateCanvas();
     </script>
 </body>
 </html>
-
-
-
-
-
-
